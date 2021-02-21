@@ -1,4 +1,4 @@
-FROM balenalib/intel-nuc-debian
+FROM balenalib/intel-nuc-debian:20210201
 
 RUN curl -sSL https://dist.crystal-lang.org/apt/setup.sh | bash
 
