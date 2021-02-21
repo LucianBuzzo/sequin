@@ -29,4 +29,4 @@ COPY . ./
 # Install crystal dependencies
 RUN shards install
 
-CMD [ "crystal", "src/sequin.cr" ]
+CMD [ "bash", "run.sh" ]
