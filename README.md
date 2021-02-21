@@ -8,7 +8,7 @@ To get started, run `./sentry`
 
 ## Tests
 
-```
+```sh
 crystal spec
 ```
 
