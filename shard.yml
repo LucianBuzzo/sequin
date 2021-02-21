@@ -1,0 +1,11 @@
+name: sequin
+version: 0.0.1
+
+authors:
+  - Lucian Buzzo <lucian.buzzo@gmail.com>
+
+dependencies:
+
+crystal: 0.35.1
+
+license: MIT

@@ -1,0 +1,15 @@
+# Created by https://www.toptal.com/developers/gitignore/api/crystal
+# Edit at https://www.toptal.com/developers/gitignore?templates=crystal
+
+### Crystal ###
+/docs/
+/lib/
+/bin/
+/.shards/
+*.dwarf
+
+# Libraries don't need dependency lock
+# Dependencies will be locked in application that uses them
+#/shard.lock
+
+# End of https://www.toptal.com/developers/gitignore/api/crystal
