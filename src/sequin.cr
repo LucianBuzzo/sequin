@@ -65,18 +65,18 @@ class BlockChain
   end
 end
 
-sequin = BlockChain.new
-sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
-sequin.add_block(Block.new("2021/02/13", { "amount" => 4 }))
-
-puts sequin.pretty_inspect
-
-puts "Is blockchain valid? " + sequin.is_chain_valid.to_s
-
-sleep 2.seconds
-
-loop do
-  puts "sleeping..."
-  sleep 30.seconds
-end
-
+# sequin = BlockChain.new
+# sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
+# sequin.add_block(Block.new("2021/02/13", { "amount" => 4 }))
+#
+# puts sequin.pretty_inspect
+#
+# puts "Is blockchain valid? " + sequin.is_chain_valid.to_s
+#
+# sleep 2.seconds
+#
+# loop do
+#   puts "sleeping..."
+#   sleep 30.seconds
+# end
+#

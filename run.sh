@@ -1,5 +1,5 @@
 #!/bin/bash
 
-crystal src/sequin.cr
+crystal spec -v
 
 tail -f /dev/null
