@@ -9,6 +9,8 @@ To get started, run `./sentry`
 ## Todo
 
 - [ ] Add development guide
+- [ ] Add automated versioning
+- [ ] Add automated testing
 - [ ] Add test harness
 - [ ] Block mining
 - [ ] Transactions
