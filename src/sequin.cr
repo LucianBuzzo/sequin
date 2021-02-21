@@ -44,12 +44,34 @@ class BlockChain
     newBlock.block_hash = newBlock.calculate_hash
     @chain.push(newBlock)
   end
+
+  def is_chain_valid()
+    @chain.each_index { | idx |
+      if idx > 0
+        current_block = @chain[idx]
+        previous_block = @chain[idx - 1]
+
+        if current_block.block_hash != current_block.calculate_hash
+          return false
+        end
+
+        if current_block.previous_block_hash != previous_block.block_hash
+          return false
+        end
+      end
+    }
+
+    return true
+  end
 end
 
 sequin = BlockChain.new
 sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
+sequin.add_block(Block.new("2021/02/13", { "amount" => 4 }))
 
-puts sequin.inspect
+puts sequin.pretty_inspect
+
+puts "Is blockchain valid? " + sequin.is_chain_valid.to_s
 
 sleep 2.seconds
 
