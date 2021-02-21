@@ -50,3 +50,11 @@ sequin = BlockChain.new
 sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
 
 puts sequin.inspect
+
+sleep 2.seconds
+
+loop do
+  puts "sleeping..."
+  sleep 30.seconds
+end
+
