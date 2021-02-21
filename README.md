@@ -1,4 +1,4 @@
-## Sequin
+# Sequin
 
 Sequin is a cryptocurrency implemented in [Crystal][crystal].
 
