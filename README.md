@@ -6,4 +6,14 @@ Sequin is a cryptocurrency implemented in [Crystal][crystal].
 
 To get started, run `./sentry`
 
+## Todo
+
+- [ ] Add development guide
+- [ ] Add test harness
+- [ ] Block mining
+- [ ] Transactions
+- [ ] Node discovery
+- [ ] Rest API
+- [ ] User interface
+
 [crystal]:https://crystal-lang.org/
