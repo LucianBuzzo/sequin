@@ -4,7 +4,7 @@ Sequin is a cryptocurrency implemented in [Crystal][crystal].
 
 ## Development
 
-To get started, run `./sentry`
+To get started, set up a balena device in local mode and use `balena push`
 
 ## Tests
 
