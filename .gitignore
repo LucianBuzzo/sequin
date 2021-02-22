@@ -13,3 +13,6 @@
 #/shard.lock
 
 # End of https://www.toptal.com/developers/gitignore/api/crystal
+
+# super-linter
+super-linter.log
