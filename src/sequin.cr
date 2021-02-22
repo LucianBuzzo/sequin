@@ -4,14 +4,14 @@ require "json"
 class Block
   property previous_block_hash : String
   property block_hash : String
+  property data : Hash(String, Int32) | Hash(String, String)
 
   def initialize(
     timestamp : String,
-    data : Hash(String, Int32) | Hash(String, String),
+    @data,
     previous_block_hash : String = ""
   )
     @timestamp = timestamp
-    @data = data
     @previous_block_hash = previous_block_hash
     @block_hash = ""
     @block_hash = self.calculate_hash.as(String)
@@ -64,19 +64,3 @@ class BlockChain
     return true
   end
 end
-
-# sequin = BlockChain.new
-# sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
-# sequin.add_block(Block.new("2021/02/13", { "amount" => 4 }))
-#
-# puts sequin.pretty_inspect
-#
-# puts "Is blockchain valid? " + sequin.is_chain_valid.to_s
-#
-# sleep 2.seconds
-#
-# loop do
-#   puts "sleeping..."
-#   sleep 30.seconds
-# end
-#
