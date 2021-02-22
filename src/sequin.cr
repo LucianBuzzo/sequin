@@ -5,27 +5,36 @@ class Block
   property previous_block_hash : String
   property block_hash : String
   property data : Hash(String, Int32) | Hash(String, String)
+  @nonce = 0
+  @block_hash = ""
 
   def initialize(
-    timestamp : String,
+    @timestamp : String,
     @data,
-    previous_block_hash : String = ""
+    @previous_block_hash : String = ""
   )
-    @timestamp = timestamp
-    @previous_block_hash = previous_block_hash
-    @block_hash = ""
     @block_hash = self.calculate_hash.as(String)
   end
 
   def calculate_hash()
     new_hash = OpenSSL::Digest.new("SHA256")
-    new_hash.update("#{@previous_block_hash}#{@timestamp}#{@data}")
+    new_hash.update("#{@previous_block_hash}#{@timestamp}#{@data}#{@nonce}")
     new_hash.final.hexstring
+  end
+
+  def mine_block(difficulty : Int32)
+    target = "0" * difficulty
+
+    until @block_hash[0..difficulty - 1] == target
+      @nonce += 1
+      @block_hash = self.calculate_hash.as(String)
+    end
   end
 end
 
 class BlockChain
   getter chain = [] of Block
+  getter difficulty = 4
 
   def initialize()
     @chain << self.create_genesis_block
@@ -41,7 +50,7 @@ class BlockChain
 
   def add_block(newBlock)
     newBlock.previous_block_hash = self.get_latest_block.block_hash
-    newBlock.block_hash = newBlock.calculate_hash
+    newBlock.mine_block(@difficulty)
     @chain.push(newBlock)
   end
 
