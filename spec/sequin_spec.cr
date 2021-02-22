@@ -46,6 +46,18 @@ describe BlockChain do
       last_block.previous_block_hash.should eq(genesis_block.block_hash)
       sequin.chain.size.should eq(2)
     end
+
+    it "should mine the new block" do
+      sequin = BlockChain.new
+      genesis_block = sequin.get_latest_block
+
+      sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
+
+      last_block = sequin.get_latest_block
+
+      last_block.block_hash[0..sequin.difficulty - 1]
+        .should eq ("0" * sequin.difficulty)
+    end
   end
 
   describe "#is_chain_valid" do
