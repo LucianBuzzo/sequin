@@ -1,3 +1,5 @@
+# Changelog
+
 ## [1.1.1](https://github.com/LucianBuzzo/sequin/compare/v1.1.0...v1.1.1) (2021-02-21)
 
 
