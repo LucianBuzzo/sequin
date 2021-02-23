@@ -4,7 +4,7 @@ require "../src/sequin"
 describe Block do
   describe "#new" do
     it "correctly generates a hash" do
-      block = Block.new("2021/02/13", { "amount" => 10 })
+      block = Block.new(Time.utc.to_s, [] of Transaction)
       block.block_hash.should be_a(String)
     end
   end
@@ -27,7 +27,7 @@ describe BlockChain do
 
       sequin.get_latest_block.should be(genesis_block)
 
-      new_block = Block.new("2021/02/13", { "amount" => 10 })
+      new_block = Block.new(Time.utc.to_s, [] of Transaction)
       sequin.add_block(new_block)
 
       sequin.get_latest_block.should be(new_block)
@@ -39,7 +39,7 @@ describe BlockChain do
       sequin = BlockChain.new
       genesis_block = sequin.get_latest_block
 
-      sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
+      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
 
       last_block = sequin.get_latest_block
 
@@ -51,7 +51,7 @@ describe BlockChain do
       sequin = BlockChain.new
       genesis_block = sequin.get_latest_block
 
-      sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
+      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
 
       last_block = sequin.get_latest_block
 
@@ -63,20 +63,36 @@ describe BlockChain do
   describe "#is_chain_valid" do
     it "correctly validates the chain" do
       sequin = BlockChain.new
-      sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
-      sequin.add_block(Block.new("2021/02/13", { "amount" => 4 }))
+      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
+      trx = Transaction.new("address1", "address2", 10)
+      sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
       sequin.is_chain_valid.should be_true
     end
 
     it "detects an invalid chain after tampering" do
       sequin = BlockChain.new
-      sequin.add_block(Block.new("2021/02/13", { "amount" => 10 }))
-      sequin.add_block(Block.new("2021/02/13", { "amount" => 4 }))
-      sequin.chain[1].data = {
-        "amount" => 100
-      }
-      sequin.chain[1].calculate_hash
+      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
+      trx = Transaction.new("address1", "address2", 10)
+      sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
+
+      sequin.chain[2].transactions[0].amount = 100
+      sequin.chain[2].calculate_hash
       sequin.is_chain_valid.should be_false
+    end
+  end
+
+  describe "#mine_pending_transactions" do
+    it "correctly rewards the miner" do
+      sequin = BlockChain.new
+      sequin.create_transaction(Transaction.new("address1", "address2", 100))
+      sequin.create_transaction(Transaction.new("address2", "address1", 70))
+      sequin.mine_pending_transactions("mining_address1")
+
+      sequin.get_balance_of_address("mining_address1").should eq (0)
+
+      sequin.mine_pending_transactions("mining_address2")
+
+      sequin.get_balance_of_address("mining_address1").should eq (sequin.mining_reward)
     end
   end
 end
