@@ -1,14 +1,14 @@
 <div align="center">
-  <img width="200" height="200" src="https://raw.githubusercontent.com/LucianBuzzo/sequin/master/sequin.png">
+  <img width="372" height="110" src="https://raw.githubusercontent.com/LucianBuzzo/sequin/master/sequin.png">
   <br>
   <br>
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/lucianbuzzo/sequin)
 ![GitHub last commit](https://img.shields.io/github/last-commit/lucianbuzzo/sequin)
-![Master](https://github.com/github/docs/actions/workflows/unit.yml/badge.svg?branch=master)
+![Master](https://github.com/lucianbuzzo/sequin/actions/workflows/unit.yml/badge.svg?branch=master)
 
   <p>
-  Sequin is a cryptocurrency implemented in [Crystal][crystal].
+  Sequin is a cryptocurrency implemented in <a href="https://crystal-lang.org/">Crystal</a>.
   </p>
   <br>
   <br>
