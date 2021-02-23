@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/LucianBuzzo/sequin/compare/v1.3.0...v1.3.1) (2021-02-23)
+
+
+### Bug Fixes
+
+* **README:** Fix broken links in README ([ccf448a](https://github.com/LucianBuzzo/sequin/commit/ccf448a9c2402e4d7c280e8842c67adb5cfb8624))
+
 # [1.3.0](https://github.com/LucianBuzzo/sequin/compare/v1.2.0...v1.3.0) (2021-02-23)
 
 
