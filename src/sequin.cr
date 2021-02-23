@@ -1,16 +1,29 @@
 require "openssl"
 require "json"
 
+class Transaction
+  property from_address : String | Nil
+  property to_address : String
+  property amount : Int32
+
+  def initialize(
+    @from_address,
+    @to_address,
+    @amount
+  )
+  end
+end
+
 class Block
   property previous_block_hash : String
   property block_hash : String
-  property data : Hash(String, Int32) | Hash(String, String)
+  property transactions = [] of Transaction
   @nonce = 0
   @block_hash = ""
 
   def initialize(
     @timestamp : String,
-    @data,
+    @transactions,
     @previous_block_hash : String = ""
   )
     @block_hash = self.calculate_hash.as(String)
@@ -18,7 +31,7 @@ class Block
 
   def calculate_hash()
     new_hash = OpenSSL::Digest.new("SHA256")
-    new_hash.update("#{@previous_block_hash}#{@timestamp}#{@data}#{@nonce}")
+    new_hash.update("#{@previous_block_hash}#{@timestamp}#{@transactions}#{@nonce}")
     new_hash.final.hexstring
   end
 
@@ -35,17 +48,55 @@ end
 class BlockChain
   getter chain = [] of Block
   getter difficulty = 4
+  getter pending_transactions = [] of Transaction
+  getter mining_reward = 100
 
   def initialize()
     @chain << self.create_genesis_block
   end
 
   def create_genesis_block()
-    Block.new("2021/02/13", { "name" => "Genesis block" }, "0")
+    Block.new(Time.utc.to_s, [] of Transaction, "0")
   end
 
   def get_latest_block
     @chain.last
+  end
+
+  def mine_pending_transactions(mining_reward_address)
+    # Create a new block containing the pending transactions
+    block = Block.new(Time.utc.to_s, @pending_transactions)
+
+    # Mine the block and push it onto the chain
+    block.mine_block(@difficulty)
+    @chain.push(block)
+
+    # Create a new transaction, rewarding the miner
+    @pending_transactions = [
+      Transaction.new(nil, mining_reward_address, @mining_reward)
+    ]
+  end
+
+  def create_transaction(trx)
+    @pending_transactions.push(trx)
+  end
+
+  def get_balance_of_address(address)
+    balance = 0
+
+    @chain.each { | block |
+      block.transactions.each { | trx |
+        if trx.from_address == address
+          balance -= trx.amount
+        end
+
+        if trx.to_address == address
+          balance += trx.amount
+        end
+      }
+    }
+
+    return balance
   end
 
   def add_block(newBlock)
