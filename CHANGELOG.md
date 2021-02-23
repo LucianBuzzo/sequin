@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/LucianBuzzo/sequin/compare/v1.2.0...v1.3.0) (2021-02-23)
+
+
+### Features
+
+* **BlockChain:** Add mining rewards and transactions ([59380a6](https://github.com/LucianBuzzo/sequin/commit/59380a6de029be502075c86e9e166b1ef225ab14))
+
 # [1.2.0](https://github.com/LucianBuzzo/sequin/compare/v1.1.1...v1.2.0) (2021-02-23)
 
 
