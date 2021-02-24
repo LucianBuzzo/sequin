@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/LucianBuzzo/sequin/compare/v1.3.1...v1.4.0) (2021-02-24)
+
+
+### Features
+
+* **Transaction:** Sign transactions using a key pair ([896ade1](https://github.com/LucianBuzzo/sequin/commit/896ade12291edd4370516bf18d349223a0c3ccb3))
+
 ## [1.3.1](https://github.com/LucianBuzzo/sequin/compare/v1.3.0...v1.3.1) (2021-02-23)
 
 
