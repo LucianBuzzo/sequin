@@ -1,4 +1,5 @@
 require "spec"
+require "secp256k1"
 require "../src/sequin"
 
 describe Block do
@@ -62,20 +63,27 @@ describe BlockChain do
 
   describe "#is_chain_valid" do
     it "correctly validates the chain" do
+      key_pair = Secp256k1::Keypair.new
+      wallet_address = Secp256k1::Util.public_key_compressed_prefix key_pair.public_key
       sequin = BlockChain.new
       sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-      trx = Transaction.new("address1", "address2", 10)
+      trx = Transaction.new(wallet_address, "address2", 10)
+      trx.sign_transaction(key_pair)
       sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
       sequin.is_chain_valid.should be_true
     end
 
     it "detects an invalid chain after tampering" do
+      key_pair = Secp256k1::Keypair.new
+      wallet_address = Secp256k1::Util.public_key_compressed_prefix key_pair.public_key
+
       sequin = BlockChain.new
       sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-      trx = Transaction.new("address1", "address2", 10)
+      trx = Transaction.new(wallet_address, "address2", 3)
+      trx.sign_transaction(key_pair)
       sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
 
-      sequin.chain[2].transactions[0].amount = 100
+      sequin.chain[2].transactions[0].amount *= 100
       sequin.chain[2].calculate_hash
       sequin.is_chain_valid.should be_false
     end
@@ -83,16 +91,27 @@ describe BlockChain do
 
   describe "#mine_pending_transactions" do
     it "correctly rewards the miner" do
-      sequin = BlockChain.new
-      sequin.create_transaction(Transaction.new("address1", "address2", 100))
-      sequin.create_transaction(Transaction.new("address2", "address1", 70))
-      sequin.mine_pending_transactions("mining_address1")
+      key_pair1 = Secp256k1::Keypair.new
+      wallet_address1 = Secp256k1::Util.public_key_compressed_prefix key_pair1.public_key
+      key_pair2 = Secp256k1::Keypair.new
+      wallet_address2 = Secp256k1::Util.public_key_compressed_prefix key_pair2.public_key
+      mining_key_pair = Secp256k1::Keypair.new
+      mining_address = Secp256k1::Util.public_key_compressed_prefix mining_key_pair.public_key
 
-      sequin.get_balance_of_address("mining_address1").should eq (0)
+      sequin = BlockChain.new
+      trx1 = Transaction.new(wallet_address1, wallet_address2, 50)
+      trx1.sign_transaction(key_pair1)
+      trx2 = Transaction.new(wallet_address2, wallet_address1, 100)
+
+      sequin.add_transaction(trx1)
+
+      sequin.mine_pending_transactions(mining_address)
+
+      sequin.get_balance_of_address(mining_address).should eq (0)
 
       sequin.mine_pending_transactions("mining_address2")
 
-      sequin.get_balance_of_address("mining_address1").should eq (sequin.mining_reward)
+      sequin.get_balance_of_address(mining_address).should eq (sequin.mining_reward)
     end
   end
 end

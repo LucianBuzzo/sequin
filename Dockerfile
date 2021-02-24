@@ -20,10 +20,12 @@ RUN apt-get update &&\
   crystal=0.35.1-1\
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# This will copy all files in our root to the working directory in the container
-COPY . ./
+COPY shard.yml ./shard.yml
 
 # Install crystal dependencies
 RUN shards install
+
+# This will copy all files in our root to the working directory in the container
+COPY . ./
 
 CMD [ "bash", "run.sh" ]

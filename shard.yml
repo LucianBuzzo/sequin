@@ -4,6 +4,11 @@ version: 0.0.1
 authors:
   - Lucian Buzzo <lucian.buzzo@gmail.com>
 
+dependencies:
+  secp256k1:
+    github: q9f/secp256k1.cr
+    version: "~> 0.3"
+
 crystal: 0.35.1
 
 license: MIT
