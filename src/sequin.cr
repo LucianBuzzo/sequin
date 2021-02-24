@@ -1,5 +1,6 @@
 require "openssl"
 require "json"
+require "secp256k1"
 
 class Transaction
   property from_address : String | Nil
@@ -11,6 +12,39 @@ class Transaction
     @to_address,
     @amount
   )
+  end
+
+  def calculate_hash
+    new_hash = OpenSSL::Digest.new("SHA256")
+    new_hash.update("#{@from_address}#{@to_address}#{@amount}")
+    new_hash.final.hexstring
+  end
+
+  def sign_transaction(signing_key)
+    public_key = Secp256k1::Util.public_key_compressed_prefix signing_key.public_key
+    if public_key != @from_address
+      raise Exception.new("You cannot sign transactions for other wallets")
+    end
+
+    hash_tx = self.calculate_hash
+    @signature = Secp256k1::Signature.sign(hash_tx, signing_key.private_key)
+  end
+
+  def is_valid
+    if @from_address == nil
+      return true
+    end
+
+
+    if !@signature
+      raise Exception.new("No signature in this transaction")
+    end
+
+    Secp256k1::Signature.verify(
+      self.calculate_hash,
+      @signature.as Secp256k1::ECDSASignature,
+      Secp256k1::Util.restore_public_key @from_address.to_s
+    )
   end
 end
 
@@ -42,6 +76,16 @@ class Block
       @nonce += 1
       @block_hash = self.calculate_hash.as(String)
     end
+  end
+
+  def has_valid_transactions
+    @transactions.each { | trx |
+      unless trx.is_valid
+        return false
+      end
+    }
+
+    return true
   end
 end
 
@@ -77,7 +121,15 @@ class BlockChain
     ]
   end
 
-  def create_transaction(trx)
+  def add_transaction(trx)
+    unless trx.from_address && trx.to_address
+      raise Exception.new("Transaction must include from and to address")
+    end
+
+    unless trx.is_valid
+      raise Exception.new("Cannot add invalid transaction to the chain")
+    end
+
     @pending_transactions.push(trx)
   end
 
@@ -111,11 +163,15 @@ class BlockChain
         current_block = @chain[idx]
         previous_block = @chain[idx - 1]
 
-        if current_block.block_hash != current_block.calculate_hash
+        unless current_block.has_valid_transactions
           return false
         end
 
-        if current_block.previous_block_hash != previous_block.block_hash
+        unless current_block.block_hash == current_block.calculate_hash
+          return false
+        end
+
+        unless current_block.previous_block_hash == previous_block.block_hash
           return false
         end
       end
