@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/LucianBuzzo/sequin/compare/v1.4.0...v1.5.0) (2021-02-26)
+
+
+### Features
+
+* **BlockCahin:** Check if funds are available when adding transaction ([976523d](https://github.com/LucianBuzzo/sequin/commit/976523d1c77399c2ee60deace412dda2101565f7))
+
 # [1.4.0](https://github.com/LucianBuzzo/sequin/compare/v1.3.1...v1.4.0) (2021-02-24)
 
 
