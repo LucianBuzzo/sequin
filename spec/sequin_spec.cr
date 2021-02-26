@@ -99,9 +99,9 @@ describe BlockChain do
       mining_address = Secp256k1::Util.public_key_compressed_prefix mining_key_pair.public_key
 
       sequin = BlockChain.new
-      trx1 = Transaction.new(wallet_address1, wallet_address2, 50)
+      trx1 = Transaction.new(wallet_address1, wallet_address2, 0)
       trx1.sign_transaction(key_pair1)
-      trx2 = Transaction.new(wallet_address2, wallet_address1, 100)
+      trx2 = Transaction.new(wallet_address2, wallet_address1, 0)
 
       sequin.add_transaction(trx1)
 
@@ -112,6 +112,23 @@ describe BlockChain do
       sequin.mine_pending_transactions("mining_address2")
 
       sequin.get_balance_of_address(mining_address).should eq (sequin.mining_reward)
+    end
+  end
+
+  describe "#add_transaction" do
+    it "Raises an error if there are insufficient funds" do
+      key_pair1 = Secp256k1::Keypair.new
+      wallet_address1 = Secp256k1::Util.public_key_compressed_prefix key_pair1.public_key
+      key_pair2 = Secp256k1::Keypair.new
+      wallet_address2 = Secp256k1::Util.public_key_compressed_prefix key_pair2.public_key
+
+      sequin = BlockChain.new
+      trx1 = Transaction.new(wallet_address1, wallet_address2, 100)
+      trx1.sign_transaction(key_pair1)
+
+      expect_raises(SequinInsufficientFundsException) do
+        sequin.add_transaction(trx1)
+      end
     end
   end
 end
