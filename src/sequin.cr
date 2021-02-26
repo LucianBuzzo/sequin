@@ -135,8 +135,6 @@ class BlockChain
 
     balance = get_balance_of_address(trx.from_address)
 
-    puts "the balance is #{balance}"
-    puts "the amount is #{trx.amount}"
     if balance < trx.amount
       raise SequinInsufficientFundsException.new("Not enough funds available in wallet for transaction")
     end

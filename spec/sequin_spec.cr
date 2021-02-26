@@ -1,6 +1,15 @@
 require "spec"
 require "secp256k1"
 require "../src/sequin"
+require "../src/wallet"
+
+describe Wallet do
+  describe "#new" do
+    it "correctly generates a hash" do
+      wallet = Wallet.new
+    end
+  end
+end
 
 describe Block do
   describe "#new" do
@@ -63,24 +72,20 @@ describe BlockChain do
 
   describe "#is_chain_valid" do
     it "correctly validates the chain" do
-      key_pair = Secp256k1::Keypair.new
-      wallet_address = Secp256k1::Util.public_key_compressed_prefix key_pair.public_key
+      wallet = Wallet.new
       sequin = BlockChain.new
       sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-      trx = Transaction.new(wallet_address, "address2", 10)
-      trx.sign_transaction(key_pair)
+      trx = wallet.create_transaction("address2", 10)
       sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
       sequin.is_chain_valid.should be_true
     end
 
     it "detects an invalid chain after tampering" do
-      key_pair = Secp256k1::Keypair.new
-      wallet_address = Secp256k1::Util.public_key_compressed_prefix key_pair.public_key
+      wallet = Wallet.new
 
       sequin = BlockChain.new
       sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-      trx = Transaction.new(wallet_address, "address2", 3)
-      trx.sign_transaction(key_pair)
+      trx = wallet.create_transaction("address2", 3)
       sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
 
       sequin.chain[2].transactions[0].amount *= 100
@@ -91,43 +96,36 @@ describe BlockChain do
 
   describe "#mine_pending_transactions" do
     it "correctly rewards the miner" do
-      key_pair1 = Secp256k1::Keypair.new
-      wallet_address1 = Secp256k1::Util.public_key_compressed_prefix key_pair1.public_key
-      key_pair2 = Secp256k1::Keypair.new
-      wallet_address2 = Secp256k1::Util.public_key_compressed_prefix key_pair2.public_key
-      mining_key_pair = Secp256k1::Keypair.new
-      mining_address = Secp256k1::Util.public_key_compressed_prefix mining_key_pair.public_key
+      wallet_1 = Wallet.new
+      wallet_2 = Wallet.new
+      mining_wallet = Wallet.new
 
       sequin = BlockChain.new
-      trx1 = Transaction.new(wallet_address1, wallet_address2, 0)
-      trx1.sign_transaction(key_pair1)
-      trx2 = Transaction.new(wallet_address2, wallet_address1, 0)
+      trx_1 = wallet_1.create_transaction(wallet_2.address, 0)
+      trx_2 = wallet_2.create_transaction(wallet_1.address, 0)
 
-      sequin.add_transaction(trx1)
+      sequin.add_transaction(trx_1)
 
-      sequin.mine_pending_transactions(mining_address)
+      sequin.mine_pending_transactions(mining_wallet.address)
 
-      sequin.get_balance_of_address(mining_address).should eq (0)
+      sequin.get_balance_of_address(mining_wallet.address).should eq (0)
 
       sequin.mine_pending_transactions("mining_address2")
 
-      sequin.get_balance_of_address(mining_address).should eq (sequin.mining_reward)
+      sequin.get_balance_of_address(mining_wallet.address).should eq (sequin.mining_reward)
     end
   end
 
   describe "#add_transaction" do
     it "Raises an error if there are insufficient funds" do
-      key_pair1 = Secp256k1::Keypair.new
-      wallet_address1 = Secp256k1::Util.public_key_compressed_prefix key_pair1.public_key
-      key_pair2 = Secp256k1::Keypair.new
-      wallet_address2 = Secp256k1::Util.public_key_compressed_prefix key_pair2.public_key
+      wallet_1 = Wallet.new
+      wallet_2 = Wallet.new
 
       sequin = BlockChain.new
-      trx1 = Transaction.new(wallet_address1, wallet_address2, 100)
-      trx1.sign_transaction(key_pair1)
+      trx = wallet_1.create_transaction(wallet_2.address, 100)
 
       expect_raises(SequinInsufficientFundsException) do
-        sequin.add_transaction(trx1)
+        sequin.add_transaction(trx)
       end
     end
   end
