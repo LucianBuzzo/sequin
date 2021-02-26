@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/LucianBuzzo/sequin/compare/v1.5.0...v1.6.0) (2021-02-26)
+
+
+### Features
+
+* **Wallet:** Add wallet with key generation and signing ([7072cfd](https://github.com/LucianBuzzo/sequin/commit/7072cfd8be7bb58ac6491aa1d4cb17904e32a929))
+
 # [1.5.0](https://github.com/LucianBuzzo/sequin/compare/v1.4.0...v1.5.0) (2021-02-26)
 
 
