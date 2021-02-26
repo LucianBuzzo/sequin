@@ -2,6 +2,9 @@ require "openssl"
 require "json"
 require "secp256k1"
 
+class SequinInsufficientFundsException < Exception
+end
+
 class Transaction
   property from_address : String | Nil
   property to_address : String
@@ -128,6 +131,14 @@ class BlockChain
 
     unless trx.is_valid
       raise Exception.new("Cannot add invalid transaction to the chain")
+    end
+
+    balance = get_balance_of_address(trx.from_address)
+
+    puts "the balance is #{balance}"
+    puts "the amount is #{trx.amount}"
+    if balance < trx.amount
+      raise SequinInsufficientFundsException.new("Not enough funds available in wallet for transaction")
     end
 
     @pending_transactions.push(trx)

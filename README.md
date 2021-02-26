@@ -48,7 +48,7 @@ make lint
 - [x] Transactions
 - [x] Transaction signing
 - [ ] Code coverage https://hannes.kaeufler.net/posts/measuring-code-coverage-in-crystal-with-kcov
-- [ ] Verify wallet has adequate funds for transaction
+- [x] Verify wallet has adequate funds for transaction
 - [ ] Wallet generation
 - [ ] Rest API
 - [ ] Node discovery
