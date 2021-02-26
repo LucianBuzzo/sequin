@@ -20,7 +20,7 @@ jobs:
       - uses: MeilCli/setup-crystal-action@v4
         with:
           crystal_version: 0.35.1
-          shards_version: 0.10.0
+          shards_version: 0.11.1
       - name: Run Crystal
         run: |
-          make test
+          shards install && make test
