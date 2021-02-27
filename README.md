@@ -50,8 +50,15 @@ make lint
 - [ ] Code coverage https://hannes.kaeufler.net/posts/measuring-code-coverage-in-crystal-with-kcov
 - [x] Verify wallet has adequate funds for transaction
 - [x] Wallet generation
-- [ ] Wallet mnemonic seed
+- [ ] Wallet enhancements
+  - [ ] Wallet mnemonic seed
+  - [ ] HD wallet
 - [ ] Rest API
+  - [ ] POST transaction
+  - [ ] GET transaction
+  - [ ] GET balance
+  - [ ] GET blockchain
+- [ ] Persistent on-node blockchain storage
 - [ ] Node discovery
 - [ ] Consensus
 - [ ] Chain recovery
