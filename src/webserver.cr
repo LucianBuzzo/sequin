@@ -13,6 +13,12 @@ class WebServer
       socket.send "Hello from Kemal!"
     end
 
-    Kemal.run
+    spawn do
+      Kemal.run
+    end
+
+    sleep 1.seconds
+
+    puts "Kemal started"
   end
 end
