@@ -9,6 +9,14 @@ dependencies:
     github: q9f/secp256k1.cr
     version: "~> 0.3"
 
+  kemal:
+    github: kemalcr/kemal
+    version: "~> 0.27.0"
+
+  crest:
+    github: mamantoha/crest
+    version: "~> 0.26.7"
+
 crystal: 0.35.1
 
 license: MIT

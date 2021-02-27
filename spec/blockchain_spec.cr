@@ -1,12 +1,10 @@
-require "spec"
-require "secp256k1"
-require "../src/sequin"
-require "../src/wallet"
+require "../src/blockchain"
 
-describe Wallet do
+describe Block do
   describe "#new" do
     it "correctly generates a hash" do
-      wallet = Wallet.new
+      block = Block.new(Time.utc.to_s, [] of Transaction)
+      block.block_hash.should be_a(String)
     end
   end
 end
@@ -19,7 +17,14 @@ describe Block do
     end
   end
 end
-
+describe Block do
+  describe "#new" do
+    it "correctly generates a hash" do
+      block = Block.new(Time.utc.to_s, [] of Transaction)
+      block.block_hash.should be_a(String)
+    end
+  end
+end
 describe BlockChain do
   describe "#new" do
     it "correctly creates a genesis block" do
