@@ -1,3 +1,4 @@
+require "spec"
 require "../src/blockchain"
 
 describe Block do

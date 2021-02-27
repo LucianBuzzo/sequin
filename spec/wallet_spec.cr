@@ -1,3 +1,4 @@
+require "spec"
 require "../src/wallet"
 
 describe Wallet do
