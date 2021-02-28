@@ -81,7 +81,7 @@ describe BlockChain do
       wallet = Wallet.new
       sequin = BlockChain.new
       sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-      trx = wallet.create_transaction("address2", 10)
+      trx = wallet.create_transaction("address2", 10.00)
       sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
       sequin.is_chain_valid.should be_true
     end
@@ -91,7 +91,7 @@ describe BlockChain do
 
       sequin = BlockChain.new
       sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-      trx = wallet.create_transaction("address2", 3)
+      trx = wallet.create_transaction("address2", 3.00)
       sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
 
       sequin.chain[2].transactions[0].amount *= 100
@@ -107,10 +107,6 @@ describe BlockChain do
       mining_wallet = Wallet.new
 
       sequin = BlockChain.new
-      trx_1 = wallet_1.create_transaction(wallet_2.address, 0)
-      trx_2 = wallet_2.create_transaction(wallet_1.address, 0)
-
-      sequin.add_transaction(trx_1)
 
       sequin.mine_pending_transactions(mining_wallet.address)
 
@@ -128,7 +124,7 @@ describe BlockChain do
       wallet_2 = Wallet.new
 
       sequin = BlockChain.new
-      trx = wallet_1.create_transaction(wallet_2.address, 100)
+      trx = wallet_1.create_transaction(wallet_2.address, 100.00)
 
       expect_raises(SequinInsufficientFundsException) do
         sequin.add_transaction(trx)
