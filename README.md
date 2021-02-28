@@ -40,32 +40,48 @@ make lint
 
 ## Todo
 
-- [x] Add automated versioning
-- [x] Block mining
-- [x] Add development guide
-- [x] Add automated testing
-- [x] Add test harness
-- [x] Transactions
-- [x] Transaction signing
+### Testing
 - [ ] Code coverage https://hannes.kaeufler.net/posts/measuring-code-coverage-in-crystal-with-kcov
-- [x] Verify wallet has adequate funds for transaction
-- [x] Wallet generation
-- [ ] Wallet enhancements
-  - [ ] Wallet mnemonic seed
-  - [ ] HD wallet
-- [ ] Rest API
-  - [ ] POST transaction
-  - [ ] GET transaction
-  - [ ] GET balance
-  - [ ] GET blockchain
+
+### Wallet
+- [ ] Wallet mnemonic seed
+- [ ] HD wallet
+
+### Transactions
+
+- [ ] Move to candidate block coinbase/generation transactions
+- [ ] Refactor to use UTXO and input/output transactions
+
+### User interface
+
+- [ ] Login using JWT
+- [ ] Wallet generation (linked to mnemonic seed?)
+
+### Rest API
+
+- [ ] Auth
+- [ ] POST transaction
+- [ ] GET transaction
+- [ ] GET balance
+- [ ] GET blockchain
+
+### Hardware
+
+- [ ] Control inkyshot screen
+
+### Decentralization
+
 - [ ] Persistent on-node blockchain storage
+  - [ ] Compressed storage format for blockchain
 - [ ] Node discovery
+- [ ] Open app on balena
 - [ ] Consensus
 - [ ] Chain recovery
+
+### Features
+
 - [ ] Security hardening
 - [ ] Lottery
 - [ ] Coin burn (ala pancakeswap)
-- [ ] User interface
-- [ ] Open app on balena
 
 [crystal]:https://crystal-lang.org/

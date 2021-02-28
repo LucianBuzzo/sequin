@@ -5,10 +5,40 @@ require "secp256k1"
 class SequinInsufficientFundsException < Exception
 end
 
+# TODO: Pull request json handling to the secp256k1 shard
+class SignatureConverter
+  def self.from_json(pull_parser : JSON::PullParser)
+    r = ""
+    s = ""
+    tmp = pull_parser.read_object { | key |
+      value = pull_parser.read_string
+      r = value if key == "r"
+      s = value if key == "s"
+    }
+
+    Secp256k1::ECDSASignature.new(
+      BigInt.new(r, 16),
+      BigInt.new(s, 16)
+    )
+  end
+
+  def self.to_json(value, json : JSON::Builder)
+    json.object do
+      json.field "r", value.r.to_s
+      json.field "s", value.s.to_s
+    end
+  end
+end
+
 class Transaction
+  include JSON::Serializable
+
   property from_address : String | Nil
   property to_address : String
-  property amount : Int32
+  property amount : Float64
+
+  @[JSON::Field(emit_null: true, converter: SignatureConverter)]
+  getter signature : Secp256k1::ECDSASignature?
 
   def initialize(
     @from_address,
@@ -16,6 +46,22 @@ class Transaction
     @amount
   )
   end
+
+#  def to_json(builder : JSON::Builder)
+#    self.to_json
+#  end
+#
+#  def to_json
+#    {
+#      "from_address" => @from_address,
+#      "to_address" => @to_address,
+#      "amount" => @amount,
+#      "signature" => @signature ? {
+#        "r" => @signature.as(Secp256k1::ECDSASignature).r,
+#        "s" => @signature.as(Secp256k1::ECDSASignature).s,
+#      } : "null"
+#    }.to_json
+#  end
 
   def calculate_hash
     new_hash = OpenSSL::Digest.new("SHA256")
@@ -43,11 +89,16 @@ class Transaction
       raise Exception.new("No signature in this transaction")
     end
 
-    Secp256k1::Signature.verify(
-      self.calculate_hash,
-      @signature.as Secp256k1::ECDSASignature,
-      Secp256k1::Util.restore_public_key @from_address.to_s
-    )
+    @signature.try { | sig |
+      Secp256k1::Signature.verify(
+        self.calculate_hash,
+        Secp256k1::ECDSASignature.new(
+          sig.r,
+          sig.s,
+        ),
+        Secp256k1::Util.restore_public_key @from_address.to_s
+      )
+    }
   end
 end
 
@@ -64,6 +115,16 @@ class Block
     @previous_block_hash : String = ""
   )
     @block_hash = self.calculate_hash.as(String)
+  end
+
+  def to_json()
+    {
+      previous_block_hash => @previous_block_hash,
+      block_hash => @block_hash,
+      timestamp => @timestamp,
+      transactions => @transactions,
+      nonce => @nonce,
+    }.to_json
   end
 
   def calculate_hash()
@@ -96,7 +157,7 @@ class BlockChain
   getter chain = [] of Block
   getter difficulty = 4
   getter pending_transactions = [] of Transaction
-  getter mining_reward = 100
+  getter mining_reward = 100.00
 
   def initialize()
     @chain << self.create_genesis_block
