@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/LucianBuzzo/sequin/compare/v1.6.0...v1.7.0) (2021-02-28)
+
+
+### Features
+
+* **Server:** Add /transaction and /transaction_pool endpoints ([ff6659a](https://github.com/LucianBuzzo/sequin/commit/ff6659aab2f9ed5d4cea87e2a2409069bd03b095))
+
 # [1.6.0](https://github.com/LucianBuzzo/sequin/compare/v1.5.0...v1.6.0) (2021-02-26)
 
 
