@@ -60,9 +60,9 @@ make lint
 ### Rest API
 
 - [ ] Auth
-- [ ] POST transaction
+- [x] POST transaction
 - [ ] GET transaction
-- [ ] GET balance
+- [x] GET balance
 - [ ] GET blockchain
 
 ### Hardware
