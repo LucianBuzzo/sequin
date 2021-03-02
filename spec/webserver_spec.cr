@@ -2,16 +2,17 @@ require "../src/server"
 require "../src/wallet"
 require "crest"
 
-host = "http://localhost:3000/api/v1"
-server = Server.new
+HOST = "http://localhost:3000/api/v1"
+PWD = "foobar"
+server = Server.new(PWD)
 
 describe Server do
   describe "/blockchain" do
-    it "should return the blockchain", focus: true do
+    it "should return the blockchain" do
       server.mine
       server.mine
 
-      response = Crest.get("#{host}/blockchain")
+      response = Crest.get("#{HOST}/blockchain")
       blockchain = Array(Block).from_json(response.body)
 
       blockchain.size.should be > 2
@@ -19,11 +20,35 @@ describe Server do
   end
 
   describe "/transaction" do
-    it "should reject malformed requests" do
+    it "should reject unauthorized requests" do
+      # Mine a few blocks so that there are some sequins on the address
+      server.mine
+      server.mine
+
+      to_address = "foobar"
+      amount = 100
+
       response = Crest.post(
-        "#{host}/transaction",
+        "#{HOST}/transaction",
         headers: {
           "Content-Type" => "application/json"
+        },
+        form: {
+          :to_address => to_address,
+          :amount => amount,
+        }.to_json,
+        handle_errors: false
+      )
+
+      response.status_code.should eq(401)
+    end
+
+    it "should reject malformed requests" do
+      response = Crest.post(
+        "#{HOST}/transaction",
+        headers: {
+          "Content-Type" => "application/json",
+          "Authorization" => "Basic #{Base64.strict_encode(PWD)}"
         },
         form: {
           :foo => "bar"
@@ -32,11 +57,6 @@ describe Server do
       )
 
       response.status_code.should eq(400)
-
-      response = Crest.get("#{host}/transaction_pool")
-
-      # The transaction pool should be empty
-      response.body.should eq("[]")
     end
 
     it "should add transactions to the pool" do
@@ -48,9 +68,10 @@ describe Server do
       amount = 100
 
       response = Crest.post(
-        "#{host}/transaction",
+        "#{HOST}/transaction",
         headers: {
-          "Content-Type" => "application/json"
+          "Content-Type" => "application/json",
+          "Authorization" => "Basic #{Base64.strict_encode(PWD)}"
         },
         form: {
           :to_address => to_address,
@@ -60,7 +81,7 @@ describe Server do
 
       response.status_code.should eq(200)
 
-      response = Crest.get("#{host}/transaction_pool")
+      response = Crest.get("#{HOST}/transaction_pool")
 
       # The transaction pool should be empty
       transactions = Array(Transaction).from_json(response.body)
@@ -82,9 +103,10 @@ describe Server do
       amount = 53.0
 
       response = Crest.post(
-        "#{host}/transaction",
+        "#{HOST}/transaction",
         headers: {
-          "Content-Type" => "application/json"
+          "Content-Type" => "application/json",
+          "Authorization" => "Basic #{Base64.strict_encode(PWD)}"
         },
         form: {
           :to_address => to_address,
@@ -95,7 +117,7 @@ describe Server do
       # Process the transaction by mining a block
       server.mine
 
-      response = Crest.get("#{host}/balance/#{to_address}")
+      response = Crest.get("#{HOST}/balance/#{to_address}")
 
       response.body.should eq({
         :amount => amount
