@@ -1,3 +1,11 @@
+# [1.8.0](https://github.com/LucianBuzzo/sequin/compare/v1.7.0...v1.8.0) (2021-03-02)
+
+
+### Features
+
+* **Server:** Add /balance/:address endpoint ([cde0b45](https://github.com/LucianBuzzo/sequin/commit/cde0b4559b9a6c0edd700b3398b659f16e5166d2))
+* **Server:** Add /blockchain endpoint ([c1415b3](https://github.com/LucianBuzzo/sequin/commit/c1415b394999b7f02b8b116a1a5224f5272214f2))
+
 # [1.7.0](https://github.com/LucianBuzzo/sequin/compare/v1.6.0...v1.7.0) (2021-02-28)
 
 
