@@ -46,6 +46,7 @@ make lint
 ### Wallet
 - [ ] Wallet mnemonic seed
 - [ ] HD wallet
+- [ ] Ability to create multiple wallets
 
 ### Transactions
 
@@ -59,11 +60,17 @@ make lint
 
 ### Rest API
 
-- [ ] Auth
+- [x] Basic Auth
 - [x] POST transaction
-- [ ] GET transaction
 - [x] GET balance
 - [x] GET blockchain
+- [ ] GET transaction
+- [ ] Multi user auth via "login with GitHub"
+  https://levelup.gitconnected.com/how-to-implement-login-with-github-in-a-react-app-bd3d704c64fc
+
+### Mining
+
+- [ ] Set mining reward adress
 
 ### Hardware
 

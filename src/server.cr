@@ -1,11 +1,39 @@
 require "kemal"
+require "base64"
 require "./blockchain"
 require "./wallet"
 
+REGISTRY_ADDRESSES = [
+  "https://88809ab7bbb81832c2cdfa142873ce3a.balena-devices.com/"
+]
+
 class Server
+  AUTH = "Authorization"
+  BASIC = "Basic"
+
   def initialize
+    initialize(nil)
+  end
+
+  def initialize(pwd : String?)
     @wallet = Wallet.new
     @blockchain = BlockChain.new
+
+    if pwd
+      @pwd = pwd
+    else
+      unless ENV.has_key?("password")
+        raise Exception.new("Looks like you for got to set the 'password' env var")
+      end
+
+      @pwd = ENV["password"]
+    end
+
+    before_post "/api/v1/transaction" do | env |
+      unless self.authorized(env)
+        halt env, status_code: 401, response: "Unauthorized"
+      end
+    end
 
     post "/api/v1/transaction" do | env |
       payload = env.params.json
@@ -51,6 +79,22 @@ class Server
     sleep 1.seconds
 
     puts "Server started"
+  end
+
+  def authorized(env)
+    if env.request.headers[AUTH]?
+      if value = env.request.headers[AUTH]
+        if value.size > 0 && value.starts_with?("Basic")
+          auth_pwd = Base64.decode_string(value[BASIC.size + 1..-1])
+
+          if auth_pwd == @pwd
+            return true
+          end
+        end
+      end
+    end
+
+    false
   end
 
   def mine
