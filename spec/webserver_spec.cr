@@ -6,6 +6,18 @@ host = "http://localhost:3000/api/v1"
 server = Server.new
 
 describe Server do
+  describe "/blockchain" do
+    it "should return the blockchain", focus: true do
+      server.mine
+      server.mine
+
+      response = Crest.get("#{host}/blockchain")
+      blockchain = Array(Block).from_json(response.body)
+
+      blockchain.size.should be > 2
+    end
+  end
+
   describe "/transaction" do
     it "should reject malformed requests" do
       response = Crest.post(
@@ -59,7 +71,7 @@ describe Server do
   end
 
   describe "/balance/:address" do
-    it "should return the balance of an address", focus: true do
+    it "should return the balance of an address" do
       address = server.address
 
       # Mine a few blocks so that there are some sequins on the address
