@@ -39,6 +39,11 @@ class Server
       }.to_json
     end
 
+    get "/api/v1/blockchain" do | env |
+      env.response.content_type = "application/json"
+      @blockchain.chain.to_json
+    end
+
     spawn do
       Kemal.run(3000, nil)
     end

@@ -47,22 +47,6 @@ class Transaction
   )
   end
 
-#  def to_json(builder : JSON::Builder)
-#    self.to_json
-#  end
-#
-#  def to_json
-#    {
-#      "from_address" => @from_address,
-#      "to_address" => @to_address,
-#      "amount" => @amount,
-#      "signature" => @signature ? {
-#        "r" => @signature.as(Secp256k1::ECDSASignature).r,
-#        "s" => @signature.as(Secp256k1::ECDSASignature).s,
-#      } : "null"
-#    }.to_json
-#  end
-
   def calculate_hash
     new_hash = OpenSSL::Digest.new("SHA256")
     new_hash.update("#{@from_address}#{@to_address}#{@amount}")
@@ -103,6 +87,8 @@ class Transaction
 end
 
 class Block
+  include JSON::Serializable
+
   property previous_block_hash : String
   property block_hash : String
   property transactions = [] of Transaction

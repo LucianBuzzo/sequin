@@ -63,7 +63,7 @@ make lint
 - [x] POST transaction
 - [ ] GET transaction
 - [x] GET balance
-- [ ] GET blockchain
+- [x] GET blockchain
 
 ### Hardware
 
