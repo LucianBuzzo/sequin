@@ -30,8 +30,17 @@ class Server
       pool
     end
 
+    get "/api/v1/balance/:address" do | env |
+      address = env.params.url["address"]
+      balance = @blockchain.get_balance_of_address(address)
+      env.response.content_type = "application/json"
+      {
+        :amount => balance
+      }.to_json
+    end
+
     spawn do
-      Kemal.run
+      Kemal.run(3000, nil)
     end
 
     sleep 1.seconds
@@ -41,6 +50,14 @@ class Server
 
   def mine
     @blockchain.mine_pending_transactions(@wallet.address)
+  end
+
+  def address
+    @wallet.address
+  end
+
+  def reward
+    @blockchain.mining_reward
   end
 
   def stop
