@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/LucianBuzzo/sequin/compare/v1.8.0...v1.9.0) (2021-03-02)
+
+
+### Features
+
+* **Server:** Add Basic Auth for creating transactions ([0600d8c](https://github.com/LucianBuzzo/sequin/commit/0600d8c6919f03278e3ccee2ac9d549c9d11c860))
+
 # [1.8.0](https://github.com/LucianBuzzo/sequin/compare/v1.7.0...v1.8.0) (2021-03-02)
 
 
