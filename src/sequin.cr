@@ -1,3 +1,5 @@
-require "./webserver"
+require "./server"
 
-WebServer.new
+sequin = Server.new
+
+sequin.start_miner

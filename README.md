@@ -80,7 +80,7 @@ make lint
 
 - [ ] Persistent on-node blockchain storage
   - [ ] Compressed storage format for blockchain
-- [ ] Node discovery
+- [x] Node discovery
 - [ ] Open app on balena
 - [ ] Consensus
 - [ ] Chain recovery

@@ -7,11 +7,11 @@ authors:
 dependencies:
   secp256k1:
     github: q9f/secp256k1.cr
-    version: "~> 0.3"
+    version: ~> 0.3
 
   kemal:
     github: kemalcr/kemal
-    version: "~> 0.27.0"
+    version: ~> 0.27.0
 
   crest:
     github: mamantoha/crest

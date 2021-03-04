@@ -124,4 +124,24 @@ describe Server do
       }.to_json)
     end
   end
+
+  describe "/node_address" do
+    it "should store registered adresses", focus: true do
+      node_address = "http://foobar.io"
+
+      Crest.post(
+        "#{HOST}/node_address",
+        headers: {
+          "Content-Type" => "application/json"
+        },
+        form: {
+          :node_address => node_address,
+        }.to_json
+      )
+
+      response = Crest.get("#{HOST}/node_address")
+
+      response.body.should eq ([ node_address ].to_json)
+    end
+  end
 end
