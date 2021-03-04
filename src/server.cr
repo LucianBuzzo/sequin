@@ -1,15 +1,20 @@
-require "kemal"
 require "base64"
+require "crest"
+require "kemal"
 require "./blockchain"
 require "./wallet"
 
-REGISTRY_ADDRESSES = [
-  "https://88809ab7bbb81832c2cdfa142873ce3a.balena-devices.com/"
+SEED_NODE_ADDRESSES = [
+  "https://88809ab7bbb81832c2cdfa142873ce3a.balena-devices.com"
 ]
+
+LOCAL_NODE_ADDRESS = "https://#{ENV["BALENA_DEVICE_UUID"]}.balena-devices.com"
 
 class Server
   AUTH = "Authorization"
   BASIC = "Basic"
+
+  @node_addresses = [ LOCAL_NODE_ADDRESS ]
 
   def initialize
     initialize(nil)
@@ -22,11 +27,11 @@ class Server
     if pwd
       @pwd = pwd
     else
-      unless ENV.has_key?("password")
-        raise Exception.new("Looks like you for got to set the 'password' env var")
+      unless ENV.has_key?("PASSWORD")
+        raise Exception.new("Looks like you for got to set the 'PASSWORD' env var")
       end
 
-      @pwd = ENV["password"]
+      @pwd = ENV["PASSWORD"]
     end
 
     before_post "/api/v1/transaction" do | env |
@@ -72,13 +77,36 @@ class Server
       @blockchain.chain.to_json
     end
 
+    post "/api/v1/node_address" do | env |
+      payload = env.params.json
+
+      unless payload.has_key?("node_address")
+        halt env, status_code: 400, response: "Missing required fields for registration"
+      end
+
+      node_address = env.params.json["node_address"].as(String)
+
+      @node_addresses.push(node_address)
+
+      halt env, response: "ack"
+    end
+
+    get "/api/v1/node_address" do | env |
+      env.response.content_type = "application/json"
+      @node_addresses.to_json
+    end
+
     spawn do
       Kemal.run(3000, nil)
     end
 
+
+
     sleep 1.seconds
 
     puts "Server started"
+
+    self.scan_peers
   end
 
   def authorized(env)
@@ -95,6 +123,59 @@ class Server
     end
 
     false
+  end
+
+  def start_miner
+    while true
+      self.mine
+      block = @blockchain.get_latest_block
+      puts "mined block #{block.block_hash}"
+      balance = @blockchain.get_balance_of_address(@wallet.address)
+      puts "new balance #{balance}"
+
+      sleep 10.seconds
+    end
+  end
+
+  def scan_peers
+    puts "Retrieving peer addresses"
+    peers = [] of String
+    @node_addresses.each { | addr |
+      if addr != LOCAL_NODE_ADDRESS
+        puts "registering with peer: #{addr}"
+        ack = Crest.post(
+          "#{addr}/node_address",
+          headers: {
+            "Content-Type" => "application/json"
+          },
+          form: {
+            :node_address => LOCAL_NODE_ADDRESS,
+          }.to_json,
+          handle_errors: false
+        )
+
+        puts ack.pretty_inspect
+
+        if ack.status_code == 200
+          puts "successfully registered with peer: #{addr}"
+          peers.push(addr)
+          response = Crest.get(
+            "#{addr}/node_address",
+            headers: {
+              "Content-Type" => "application/json"
+            }
+          )
+
+          Array(String).from_json(response.body).each { | peer |
+            peers.push(peer)
+          }
+        else
+          puts "unable to register with peer: #{addr}"
+        end
+      end
+    }
+
+    @node_addresses = peers
   end
 
   def mine
