@@ -103,16 +103,6 @@ class Block
     @block_hash = self.calculate_hash.as(String)
   end
 
-  def to_json()
-    {
-      previous_block_hash => @previous_block_hash,
-      block_hash => @block_hash,
-      timestamp => @timestamp,
-      transactions => @transactions,
-      nonce => @nonce,
-    }.to_json
-  end
-
   def calculate_hash()
     new_hash = OpenSSL::Digest.new("SHA256")
     new_hash.update("#{@previous_block_hash}#{@timestamp}#{@transactions}#{@nonce}")
@@ -143,7 +133,7 @@ class BlockChain
   getter chain = [] of Block
   getter difficulty = 4
   getter pending_transactions = [] of Transaction
-  getter mining_reward = 100.00
+  getter mining_reward = 10.00
 
   def initialize()
     @chain << self.create_genesis_block
@@ -213,21 +203,34 @@ class BlockChain
     @chain.push(newBlock)
   end
 
+  def is_block_valid(block : Block, previous_block_hash : String)
+    unless block.previous_block_hash == previous_block_hash
+      puts "wrong prev block hash"
+      return false
+    end
+
+    unless block.has_valid_transactions
+      puts "invalid transactions"
+      return false
+    end
+
+    unless block.block_hash == block.calculate_hash
+      puts "invalid block hash"
+      return false
+    end
+
+    return true
+  end
+
   def is_chain_valid()
     @chain.each_index { | idx |
       if idx > 0
         current_block = @chain[idx]
         previous_block = @chain[idx - 1]
 
-        unless current_block.has_valid_transactions
-          return false
-        end
+        previous_block_hash = previous_block.block_hash
 
-        unless current_block.block_hash == current_block.calculate_hash
-          return false
-        end
-
-        unless current_block.previous_block_hash == previous_block.block_hash
+        unless self.is_block_valid(current_block, previous_block_hash)
           return false
         end
       end
