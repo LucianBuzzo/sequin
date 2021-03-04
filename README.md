@@ -41,9 +41,15 @@ make lint
 ## Todo
 
 ### Testing
+
 - [ ] Code coverage https://hannes.kaeufler.net/posts/measuring-code-coverage-in-crystal-with-kcov
 
+### Blockchain
+
+- [ ] Handle forks
+
 ### Wallet
+
 - [ ] Wallet mnemonic seed
 - [ ] HD wallet
 - [ ] Ability to create multiple wallets
@@ -78,12 +84,17 @@ make lint
 
 ### Decentralization
 
+- [ ] Download Chain on startup
 - [ ] Persistent on-node blockchain storage
   - [ ] Compressed storage format for blockchain
 - [x] Node discovery
 - [ ] Open app on balena
 - [ ] Consensus
-- [ ] Chain recovery
+  - [] Broadcast newly mined blocks
+  - [x] Verify received block
+  - [ ] Stop mining upon receiving valid block
+  - [x] Propagate block to peers
+  - [ ] Remove conflicting transactions
 
 ### Features
 

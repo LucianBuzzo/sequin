@@ -14,6 +14,7 @@ class Server
   AUTH = "Authorization"
   BASIC = "Basic"
 
+  property blockchain = BlockChain.new
   @node_addresses = [ LOCAL_NODE_ADDRESS ]
 
   def initialize
@@ -22,7 +23,6 @@ class Server
 
   def initialize(pwd : String?)
     @wallet = Wallet.new
-    @blockchain = BlockChain.new
 
     if pwd
       @pwd = pwd
@@ -96,6 +96,28 @@ class Server
       @node_addresses.to_json
     end
 
+    post "/api/v1/block" do | env |
+      payload = env.request.body.as(IO).gets_to_end
+
+      block = Block.from_json(payload)
+
+      # Validate block
+      previous_block_hash = @blockchain.get_latest_block.block_hash
+      unless @blockchain.is_block_valid(block, previous_block_hash)
+        halt env, status_code: 422, response: "invalid block"
+      end
+
+      # TODO: If valid, halt mining
+
+      # If valid add block to chain
+      @blockchain.chain.push(block)
+
+      # If valid, broadcast block
+      self.broadcast_block(block)
+
+      halt env, response: "ack"
+    end
+
     spawn do
       Kemal.run(3000, nil)
     end
@@ -125,11 +147,28 @@ class Server
     false
   end
 
+  def broadcast_block(block)
+    @node_addresses.each { | node_address |
+      # TODO: on error remove node address
+      Crest.post(
+        "#{HOST}/api/v1/block",
+        headers: {
+          "Content-Type" => "application/json"
+        },
+        form: block.to_json,
+        handle_errors: false
+      )
+    }
+  end
+
   def start_miner
     while true
       self.mine
+
       block = @blockchain.get_latest_block
       puts "mined block #{block.block_hash}"
+      self.broadcast_block(block)
+
       balance = @blockchain.get_balance_of_address(@wallet.address)
       puts "new balance #{balance}"
 

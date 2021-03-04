@@ -65,7 +65,7 @@ describe Server do
       server.mine
 
       to_address = "foobar"
-      amount = 100
+      amount = 5
 
       response = Crest.post(
         "#{HOST}/transaction",
@@ -83,7 +83,6 @@ describe Server do
 
       response = Crest.get("#{HOST}/transaction_pool")
 
-      # The transaction pool should be empty
       transactions = Array(Transaction).from_json(response.body)
       transactions.size.should eq(2)
       transactions[-1].to_address.should eq(to_address)
@@ -126,7 +125,7 @@ describe Server do
   end
 
   describe "/node_address" do
-    it "should store registered adresses", focus: true do
+    it "should store registered adresses" do
       node_address = "http://foobar.io"
 
       Crest.post(
@@ -142,6 +141,46 @@ describe Server do
       response = Crest.get("#{HOST}/node_address")
 
       response.body.should eq ([ node_address ].to_json)
+    end
+  end
+
+  describe "/block" do
+    it "should add a block to the chain" do
+      blockchain = server.blockchain
+      block = Block.new(
+        Time.utc.to_s,
+        [] of Transaction,
+        blockchain.get_latest_block.block_hash
+      )
+
+      Crest.post(
+        "#{HOST}/block",
+        headers: {
+          "Content-Type" => "application/json"
+        },
+        form: block.to_json
+      )
+
+      blockchain.get_latest_block.block_hash.should eq(block.block_hash)
+    end
+
+  it "should reject an invalid block" do
+      blockchain = server.blockchain
+      block = Block.new(
+        Time.utc.to_s,
+        [] of Transaction,
+        "foobar"
+      )
+
+      expect_raises(Crest::UnprocessableEntity) do
+        Crest.post(
+          "#{HOST}/block",
+          headers: {
+            "Content-Type" => "application/json"
+          },
+          form: block.to_json
+        )
+      end
     end
   end
 end
