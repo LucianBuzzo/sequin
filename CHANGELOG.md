@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/LucianBuzzo/sequin/compare/v1.9.0...v1.10.0) (2021-03-04)
+
+
+### Features
+
+* **Network:** Add basic peer discovery ([2412572](https://github.com/LucianBuzzo/sequin/commit/2412572f610f19a270d3415b6d2ec8826a1a0751))
+
 # [1.9.0](https://github.com/LucianBuzzo/sequin/compare/v1.8.0...v1.9.0) (2021-03-02)
 
 
