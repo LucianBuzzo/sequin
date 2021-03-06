@@ -3,7 +3,6 @@ require "secp256k1"
 class Wallet
   def initialize()
     rand = Random::Secure.random_bytes(64).to_s
-    puts rand
     initialize(rand)
   end
 

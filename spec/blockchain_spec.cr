@@ -39,40 +39,14 @@ describe BlockChain do
   describe "#get_latest_block" do
     it "returns the latest block" do
       sequin = BlockChain.new
+      wallet = Wallet.new
       genesis_block = sequin.chain.last
 
       sequin.get_latest_block.should be(genesis_block)
 
-      new_block = Block.new(Time.utc.to_s, [] of Transaction)
-      sequin.add_block(new_block)
+      sequin.mine_pending_transactions(wallet.address)
 
-      sequin.get_latest_block.should be(new_block)
-    end
-  end
-
-  describe "#add_block" do
-    it "correctly adds a new block" do
-      sequin = BlockChain.new
-      genesis_block = sequin.get_latest_block
-
-      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-
-      last_block = sequin.get_latest_block
-
-      last_block.previous_block_hash.should eq(genesis_block.block_hash)
-      sequin.chain.size.should eq(2)
-    end
-
-    it "should mine the new block" do
-      sequin = BlockChain.new
-      genesis_block = sequin.get_latest_block
-
-      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
-
-      last_block = sequin.get_latest_block
-
-      last_block.block_hash[0..sequin.difficulty - 1]
-        .should eq ("0" * sequin.difficulty)
+      sequin.get_latest_block.should_not be(genesis_block)
     end
   end
 
@@ -80,9 +54,11 @@ describe BlockChain do
     it "correctly validates the chain" do
       wallet = Wallet.new
       sequin = BlockChain.new
-      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
+      sequin.mine_pending_transactions(wallet.address)
+      sequin.mine_pending_transactions(wallet.address)
       trx = wallet.create_transaction("address2", 10.00)
-      sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
+      sequin.add_transaction(trx)
+      sequin.mine_pending_transactions(wallet.address)
       sequin.is_chain_valid.should be_true
     end
 
@@ -90,9 +66,11 @@ describe BlockChain do
       wallet = Wallet.new
 
       sequin = BlockChain.new
-      sequin.add_block(Block.new(Time.utc.to_s, [] of Transaction))
+      sequin.mine_pending_transactions(wallet.address)
+      sequin.mine_pending_transactions(wallet.address)
       trx = wallet.create_transaction("address2", 3.00)
-      sequin.add_block(Block.new(Time.utc.to_s, [ trx ]))
+      sequin.add_transaction(trx)
+      sequin.mine_pending_transactions(wallet.address)
 
       sequin.chain[2].transactions[0].amount *= 100
       sequin.chain[2].calculate_hash
