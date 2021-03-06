@@ -139,6 +139,10 @@ class BlockChain
     @chain << self.create_genesis_block
   end
 
+  def initialize(chain)
+    @chain = chain
+  end
+
   def create_genesis_block()
     Block.new(Time.utc.to_s, [] of Transaction, "0")
   end
@@ -205,17 +209,14 @@ class BlockChain
 
   def is_block_valid(block : Block, previous_block_hash : String)
     unless block.previous_block_hash == previous_block_hash
-      puts "wrong prev block hash"
       return false
     end
 
     unless block.has_valid_transactions
-      puts "invalid transactions"
       return false
     end
 
     unless block.block_hash == block.calculate_hash
-      puts "invalid block hash"
       return false
     end
 

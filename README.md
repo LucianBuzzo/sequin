@@ -85,12 +85,12 @@ make lint
 ### Decentralization
 
 - [ ] Download Chain on startup
-- [ ] Persistent on-node blockchain storage
-  - [ ] Compressed storage format for blockchain
+- [x] Persistent on-node blockchain storage
+- [ ] Compressed storage format for blockchain
 - [x] Node discovery
 - [ ] Open app on balena
 - [ ] Consensus
-  - [] Broadcast newly mined blocks
+  - [ ] Broadcast newly mined blocks
   - [x] Verify received block
   - [ ] Stop mining upon receiving valid block
   - [x] Propagate block to peers
