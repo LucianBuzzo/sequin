@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/LucianBuzzo/sequin/compare/v1.10.0...v1.11.0) (2021-03-06)
+
+
+### Features
+
+* **Server:** Add API endpoint for validating new blocks ([b95268e](https://github.com/LucianBuzzo/sequin/commit/b95268ee16fdc873f6aece03dc40b3986b04bc65))
+
 # [1.10.0](https://github.com/LucianBuzzo/sequin/compare/v1.9.0...v1.10.0) (2021-03-04)
 
 
