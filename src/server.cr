@@ -22,8 +22,6 @@ class Server
   end
 
   def initialize(pwd : String?)
-    @wallet = Wallet.new
-
     # Load any saved blockchain data
     if File.readable?(SAVEFILE)
       blockchain_json = File.read(SAVEFILE)
@@ -33,11 +31,18 @@ class Server
       @blockchain = BlockChain.new
     end
 
+    # Generate wallet from seed if it exists
+    if ENV.has_key?("WALLET_SEED")
+      @wallet = Wallet.new(ENV["WALLET_SEED"])
+    else
+      @wallet = Wallet.new
+    end
+
     if pwd
       @pwd = pwd
     else
       unless ENV.has_key?("PASSWORD")
-        raise Exception.new("Looks like you for got to set the 'PASSWORD' env var")
+        raise Exception.new("Looks like you forgot to set the 'PASSWORD' env var")
       end
 
       @pwd = ENV["PASSWORD"]

@@ -14,6 +14,16 @@
   <br>
 </div>
 
+## Getting Started
+
+To get started create a new application on [balena-cloud.com](https://dashboard.balena-cloud.com) and `balena push` this source code to it.
+
+### Environment variables
+
+| Name | Description |
+| ---- | ----------- |
+| `WALLET_SEED` | String used to generate a server side wallet, which is used to sign transactions and for allocating mining rewards |
+| `PASSWORD` | String used to authenticate with the server when creating transactions |
 
 ## Development
 
