@@ -130,7 +130,7 @@ class Block
 end
 
 class BlockChain
-  getter chain = [] of Block
+  property chain = [] of Block
   getter difficulty = 4
   getter pending_transactions = [] of Transaction
   getter mining_reward = 10.00
@@ -224,7 +224,11 @@ class BlockChain
   end
 
   def is_chain_valid()
-    @chain.each_index { | idx |
+    self.is_chain_valid(@chain)
+  end
+
+  def is_chain_valid(chain_to_validate)
+    chain_to_validate.each_index { | idx |
       if idx > 0
         current_block = @chain[idx]
         previous_block = @chain[idx - 1]
