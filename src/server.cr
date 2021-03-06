@@ -143,6 +143,7 @@ class Server
     puts "Server started"
 
     self.scan_peers
+    self.calibrate_chain
   end
 
   def authorized(env)
@@ -199,6 +200,30 @@ class Server
 
       sleep 10.seconds
     end
+  end
+
+  def calibrate_chain
+    @node_addresses.each { | addr |
+      if addr != LOCAL_NODE_ADDRESS
+        block_height = @blockchain.chain.size
+        last_hash = @blockchain.get_latest_block.block_hash
+        response = Crest.get(
+          "#{addr}/blockchain",
+          headers: {
+            "Content-Type" => "application/json"
+          },
+          handle_errors: false
+        )
+        if response.status_code == 200
+          result = Array(Block).from_json(response.body)
+          if result.size > block_height && @blockchain.is_chain_valid(result)
+            @blockchain.chain = result
+            block_height = @blockchain.chain.size
+            last_hash = @blockchain.get_latest_block.block_hash
+          end
+        end
+      end
+    }
   end
 
   def scan_peers

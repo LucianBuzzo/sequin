@@ -94,7 +94,7 @@ make lint
 
 ### Decentralization
 
-- [ ] Download Chain on startup
+- [x] Download Chain on startup
 - [x] Persistent on-node blockchain storage
 - [ ] Compressed storage format for blockchain
 - [x] Node discovery
