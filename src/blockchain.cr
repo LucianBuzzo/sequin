@@ -153,7 +153,11 @@ class BlockChain
 
   def mine_pending_transactions(mining_reward_address)
     # Create a new block containing the pending transactions
-    block = Block.new(Time.utc.to_s, @pending_transactions)
+    block = Block.new(
+      Time.utc.to_s,
+      @pending_transactions,
+      self.get_latest_block.block_hash
+    )
 
     # Mine the block and push it onto the chain
     block.mine_block(@difficulty)
@@ -201,22 +205,19 @@ class BlockChain
     return balance
   end
 
-  def add_block(newBlock)
-    newBlock.previous_block_hash = self.get_latest_block.block_hash
-    newBlock.mine_block(@difficulty)
-    @chain.push(newBlock)
-  end
-
   def is_block_valid(block : Block, previous_block_hash : String)
     unless block.previous_block_hash == previous_block_hash
+      puts "prev hash doesn't match"
       return false
     end
 
     unless block.has_valid_transactions
+      puts "invalid transactions"
       return false
     end
 
     unless block.block_hash == block.calculate_hash
+      puts "bogus block_hash"
       return false
     end
 
