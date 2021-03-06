@@ -4,17 +4,17 @@ require "kemal"
 require "./blockchain"
 require "./wallet"
 
+SAVEFILE = "/data/blockchain.json"
 SEED_NODE_ADDRESSES = [
   "https://88809ab7bbb81832c2cdfa142873ce3a.balena-devices.com"
 ]
-
 LOCAL_NODE_ADDRESS = "https://#{ENV["BALENA_DEVICE_UUID"]}.balena-devices.com"
 
 class Server
   AUTH = "Authorization"
   BASIC = "Basic"
 
-  property blockchain = BlockChain.new
+  property blockchain : BlockChain
   @node_addresses = [ LOCAL_NODE_ADDRESS ]
 
   def initialize
@@ -23,6 +23,15 @@ class Server
 
   def initialize(pwd : String?)
     @wallet = Wallet.new
+
+    # Load any saved blockchain data
+    if File.readable?(SAVEFILE)
+      blockchain_json = File.read(SAVEFILE)
+      @blockchain = BlockChain.new(Array(Block).from_json(blockchain_json))
+      puts "loaded blockchain from file: #{@blockchain.chain.size} blocks"
+    else
+      @blockchain = BlockChain.new
+    end
 
     if pwd
       @pwd = pwd
@@ -151,7 +160,7 @@ class Server
     @node_addresses.each { | node_address |
       # TODO: on error remove node address
       Crest.post(
-        "#{HOST}/api/v1/block",
+        "#{node_address}/api/v1/block",
         headers: {
           "Content-Type" => "application/json"
         },
@@ -162,6 +171,8 @@ class Server
   end
 
   def start_miner
+    last_hash = @blockchain.get_latest_block.block_hash
+
     while true
       self.mine
 
@@ -171,6 +182,15 @@ class Server
 
       balance = @blockchain.get_balance_of_address(@wallet.address)
       puts "new balance #{balance}"
+
+      if last_hash != block.block_hash
+        last_hash = block.block_hash
+
+        File.write(
+          SAVEFILE,
+          @blockchain.chain.to_json
+        )
+      end
 
       sleep 10.seconds
     end
