@@ -1,3 +1,12 @@
+# [1.12.0](https://github.com/LucianBuzzo/sequin/compare/v1.11.0...v1.12.0) (2021-03-06)
+
+
+### Features
+
+* **Server:** Generate server wallet deterministically ([77f4654](https://github.com/LucianBuzzo/sequin/commit/77f465457eb4c45eeb34b1bdbb4fbde0622de474))
+* **Server:** Load blockchain from peer nodes on startup ([6ed2589](https://github.com/LucianBuzzo/sequin/commit/6ed25894db5e847a7786a3ac5b9d9b475b176415))
+* **Server:** Retrieve stored blockchain on startup ([c5f3562](https://github.com/LucianBuzzo/sequin/commit/c5f35625b17384a85533b17f9b5e9629badc8a7b))
+
 # [1.11.0](https://github.com/LucianBuzzo/sequin/compare/v1.10.0...v1.11.0) (2021-03-06)
 
 
