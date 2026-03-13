@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sequin.local/schemas/tx.schema.json",
+  "title": "Sequin Transaction",
+  "type": "object",
+  "required": ["id", "from", "to", "amount", "nonce", "createdAt", "signature"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "from": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]{1,39}$"
+    },
+    "to": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]{1,39}$"
+    },
+    "amount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nonce": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "memo": {
+      "type": "string",
+      "maxLength": 280
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "type": "string",
+      "minLength": 16
+    }
+  }
+}

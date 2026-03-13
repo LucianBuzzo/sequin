@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sequin.local/schemas/wallet.schema.json",
+  "title": "Sequin Wallet Registration",
+  "type": "object",
+  "required": ["github", "pubkey", "createdAt"],
+  "additionalProperties": false,
+  "properties": {
+    "github": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9-]{1,39}$"
+    },
+    "pubkey": {
+      "type": "string",
+      "minLength": 16,
+      "pattern": "^ed25519:[A-Za-z0-9+/=]+$"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

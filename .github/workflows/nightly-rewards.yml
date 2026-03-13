@@ -1,0 +1,44 @@
+name: nightly-rewards
+
+on:
+  schedule:
+    - cron: '10 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  reward-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate placeholder reward manifest
+        run: |
+          mkdir -p rewards
+          DATE=$(date -u +%F)
+          FILE="rewards/${DATE}.json"
+          cat > "$FILE" <<'JSON'
+          {
+            "epoch": "DATE_PLACEHOLDER",
+            "notes": "TODO: implement PoPR scoring and reward tx generation",
+            "rewards": []
+          }
+          JSON
+          sed -i "s/DATE_PLACEHOLDER/${DATE}/g" "$FILE"
+      - name: Open reward PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/nightly-rewards
+          title: "chore(rewards): nightly reward manifest"
+          body: |
+            Automated nightly reward manifest.
+
+            TODO in follow-up:
+            - Query merged PR activity
+            - Score contributions
+            - Emit reward transactions
+          commit-message: "chore(rewards): generate nightly reward manifest"
