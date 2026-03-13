@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '10 0 * * *'
   workflow_dispatch:
+    inputs:
+      date:
+        description: 'Epoch date (YYYY-MM-DD). Defaults to yesterday UTC.'
+        required: false
 
 jobs:
   reward-pr:
@@ -16,29 +20,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Generate placeholder reward manifest
+      - name: Generate reward manifest from merged PR activity
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_DATE: ${{ github.event.inputs.date }}
         run: |
-          mkdir -p rewards
-          DATE=$(date -u +%F)
-          FILE="rewards/${DATE}.json"
-          cat > "$FILE" <<'JSON'
-          {
-            "epoch": "DATE_PLACEHOLDER",
-            "notes": "TODO: implement PoPR scoring and reward tx generation",
-            "rewards": []
-          }
-          JSON
-          sed -i "s/DATE_PLACEHOLDER/${DATE}/g" "$FILE"
+          if [ -n "${INPUT_DATE}" ]; then
+            node scripts/score_epoch.js --date "${INPUT_DATE}"
+          else
+            node scripts/score_epoch.js
+          fi
       - name: Open reward PR
         uses: peter-evans/create-pull-request@v7
         with:
           branch: bot/nightly-rewards
-          title: "chore(rewards): nightly reward manifest"
+          title: "chore(rewards): nightly PoPR reward manifest"
           body: |
-            Automated nightly reward manifest.
+            Automated nightly reward manifest generated from merged PR activity.
 
-            TODO in follow-up:
-            - Query merged PR activity
-            - Score contributions
-            - Emit reward transactions
-          commit-message: "chore(rewards): generate nightly reward manifest"
+            This includes:
+            - scorer config snapshot
+            - per-user reward allocations
+            - per-PR scoring details for auditability
+          commit-message: "chore(rewards): generate nightly PoPR reward manifest"
