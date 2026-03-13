@@ -57,7 +57,8 @@ Main branch is the canonical chain.
 - [x] Add docs for "wallet registration by PR"
 - [x] Add docs for "send sequins via PR"
 - [x] Run validation locally (schema + deterministic state rebuild)
-- [ ] Open PR with V1 scaffold
+- [x] Open PR with V1 scaffold
+- [x] Replace nightly rewards placeholder with initial PoPR scoring script
 
 ## Progress notes
 

@@ -1,0 +1,12 @@
+{
+  "repos": [
+    "LucianBuzzo/sequin"
+  ],
+  "excludeLogins": [
+    "dependabot[bot]",
+    "github-actions[bot]"
+  ],
+  "dailyEmission": 10000,
+  "maxPRsPerUser": 5,
+  "maxScorePerUser": 120
+}
