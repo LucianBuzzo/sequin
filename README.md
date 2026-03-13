@@ -3,113 +3,128 @@
   <br>
   <br>
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/lucianbuzzo/sequin)
 ![GitHub last commit](https://img.shields.io/github/last-commit/lucianbuzzo/sequin)
-![Master](https://github.com/lucianbuzzo/sequin/actions/workflows/unit.yml/badge.svg?branch=master)
+![Validate TX](https://github.com/lucianbuzzo/sequin/actions/workflows/validate-tx.yml/badge.svg?branch=master)
+![Nightly Rewards](https://github.com/lucianbuzzo/sequin/actions/workflows/nightly-rewards.yml/badge.svg?branch=master)
 
   <p>
-  Sequin is a cryptocurrency implemented in <a href="https://crystal-lang.org/">Crystal</a>.
+  Sequin is a <strong>GitHub-native novelty cryptocurrency</strong>.
   </p>
-  <br>
+  <p>
+  No always-on server required: repo state is the ledger, PRs are transactions, and GitHub Actions validates + mints.
+  </p>
   <br>
 </div>
 
-## Getting Started
+## What changed?
 
-To get started create a new application on [balena-cloud.com](https://dashboard.balena-cloud.com) and `balena push` this source code to it.
+Sequin originally started as a Crystal server app.
 
-### Environment variables
+It now follows a new design:
 
-| Name | Description |
-| ---- | ----------- |
-| `WALLET_SEED` | String used to generate a server side wallet, which is used to sign transactions and for allocating mining rewards |
-| `PASSWORD` | String used to authenticate with the server when creating transactions |
+- **Ledger lives in git** (`ledger/`)
+- **Wallets are registered by PR** (`wallets/<github-user>.json`)
+- **Transfers are submitted by PR** (`tx/pending/*.json`)
+- **Nightly rewards are generated from GitHub PR activity** (`rewards/YYYY-MM-DD.json`)
+- **Rewards are auto-minted** into the ledger by GitHub Actions
 
-## Development
+`master` is the canonical chain.
 
-To get started, set up a [balena](https://dashboard.balena-cloud.com/) device in local mode and use `balena push`. This
-will run a docker container on the device that executes the test suite, then
-sleeps. Saving changes to the project will cause the test suite to be executed
-again.
+---
 
-## Tests
+## Repository layout
 
-To run unit tests locally:
-
-```sh
-make test
+```txt
+ledger/
+  blocks/
+  state/
+wallets/
+tx/pending/
+rewards/
+schemas/
+scripts/
+.github/workflows/
 ```
 
-Linting uses [the GitHub super-linter
-project](https://github.com/github/super-linter) and can be run locally using
-docker with:
+---
 
-```sh
-make lint
+## How it works
+
+### 1) Register a wallet
+
+- Generate keypair locally (private key stays local)
+- Commit `wallets/<your-github-username>.json`
+- Open PR
+- `validate-tx` must pass
+- Merge PR to register wallet
+
+### 2) Send sequins
+
+- Create/sign tx JSON in `tx/pending/`
+- Open PR
+- `validate-tx` checks schema + signature + nonce + balance
+- Merge PR
+- `rebuild-ledger` applies tx into a new block and updates balances/nonces
+
+### 3) Nightly rewards (Proof of PR)
+
+`nightly-rewards` workflow:
+
+1. Scores merged PR activity
+2. Writes manifest `rewards/YYYY-MM-DD.json`
+3. Auto-mints rewards into ledger state
+4. Commits reward block + state updates
+
+---
+
+## Safety guardrails (current)
+
+- Rejects tiny PR contributions in scoring (`<10` changed lines)
+- Excludes configured bot accounts from rewards
+- Penalizes self-merge in scoring
+- Caps scored PRs per user per day
+- Caps max score per user per day
+- Mint-time checks:
+  - reject if total distributed > daily emission
+  - reject if any user reward > `maxRewardPerUser`
+  - optional weekday abort when merged PR count is zero
+
+Config: `config/reward-repos.json`
+
+---
+
+## Local usage
+
+### CLI helper
+
+```bash
+node scripts/sequin_cli.js wallet:create --github <your-github-username>
+node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello"
 ```
 
-## Todo
+- Public wallet file: `wallets/<username>.json`
+- Private key path: `.sequin/keys/<username>.key` (gitignored)
 
-### Testing
+### Validation scripts
 
-- [ ] Code coverage https://hannes.kaeufler.net/posts/measuring-code-coverage-in-crystal-with-kcov
+```bash
+node scripts/verify_chain.js
+node scripts/verify_tx.js
+node scripts/score_epoch.js --date YYYY-MM-DD
+node scripts/mint_rewards.js --date YYYY-MM-DD
+```
 
-### Blockchain
+---
 
-- [ ] Handle forks
+## Notes
 
-### Wallet
+- This is intentionally a novelty/experimental chain model.
+- Consensus is governance + branch protection + required checks.
+- If you enable merge queue and strict required checks, you reduce nonce race/collision risk.
 
-- [ ] Wallet mnemonic seed
-- [ ] HD wallet
-- [ ] Ability to create multiple wallets
+---
 
-### Transactions
+## Related docs
 
-- [ ] Move to candidate block coinbase/generation transactions
-- [ ] Refactor to use UTXO and input/output transactions
-
-### User interface
-
-- [ ] Login using JWT
-- [ ] Wallet generation (linked to mnemonic seed?)
-
-### Rest API
-
-- [x] Basic Auth
-- [x] POST transaction
-- [x] GET balance
-- [x] GET blockchain
-- [ ] GET transaction
-- [ ] Multi user auth via "login with GitHub"
-  https://levelup.gitconnected.com/how-to-implement-login-with-github-in-a-react-app-bd3d704c64fc
-
-### Mining
-
-- [ ] Set mining reward adress
-
-### Hardware
-
-- [ ] Control inkyshot screen
-
-### Decentralization
-
-- [x] Download Chain on startup
-- [x] Persistent on-node blockchain storage
-- [ ] Compressed storage format for blockchain
-- [x] Node discovery
-- [ ] Open app on balena
-- [ ] Consensus
-  - [ ] Broadcast newly mined blocks
-  - [x] Verify received block
-  - [ ] Stop mining upon receiving valid block
-  - [x] Propagate block to peers
-  - [ ] Remove conflicting transactions
-
-### Features
-
-- [ ] Security hardening
-- [ ] Lottery
-- [ ] Coin burn (ala pancakeswap)
-
-[crystal]:https://crystal-lang.org/
+- `GITHUB_NATIVE_SEQUIN_PLAN.md`
+- `GITHUB_NATIVE_USAGE.md`
