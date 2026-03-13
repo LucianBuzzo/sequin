@@ -63,6 +63,7 @@ scripts/
 - Create/sign tx JSON in `tx/pending/`
 - Open PR
 - `validate-tx` checks schema + signature + nonce + balance
+  - signature payload is versioned (`sigVersion: 1`) for deterministic verification
 - Merge PR
 - `rebuild-ledger` applies tx into a new block and updates balances/nonces
 
@@ -99,6 +100,7 @@ Config: `config/reward-repos.json`
 
 ```bash
 node scripts/sequin_cli.js wallet:create --github <your-github-username>
+node scripts/sequin_cli.js tx:next-nonce --user <you>
 node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello"
 ```
 
@@ -112,6 +114,7 @@ node scripts/verify_chain.js
 node scripts/verify_tx.js
 node scripts/score_epoch.js --date YYYY-MM-DD
 node scripts/mint_rewards.js --date YYYY-MM-DD
+node scripts/ledger_summary.js --top 10 --epochs 7
 ```
 
 ---
@@ -121,6 +124,8 @@ node scripts/mint_rewards.js --date YYYY-MM-DD
 - This is intentionally a novelty/experimental chain model.
 - Consensus is governance + branch protection + required checks.
 - If you enable merge queue and strict required checks, you reduce nonce race/collision risk.
+- Nonce collision policy: if two tx PRs race for the same sender nonce, the later one should rebase, regenerate with the next nonce, and rerun checks.
+- Reward scoring epoch uses UTC calendar days (`00:00:00Z` to `23:59:59Z`).
 
 ---
 

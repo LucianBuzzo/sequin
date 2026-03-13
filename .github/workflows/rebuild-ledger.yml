@@ -26,7 +26,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ledger tx/pending
+          git add -A ledger tx rewards || true
           if git diff --cached --quiet; then
             echo "No ledger changes to commit"
             exit 0

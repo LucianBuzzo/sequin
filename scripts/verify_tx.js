@@ -42,6 +42,7 @@ function canonicalTxPayload(tx) {
     to: tx.to,
     amount: tx.amount,
     nonce: tx.nonce,
+    sigVersion: tx.sigVersion,
     memo: tx.memo || '',
     createdAt: tx.createdAt,
   };
@@ -119,7 +120,7 @@ for (const tf of txFiles) {
   const tx = readJson(tf);
   const ctx = `${path.basename(tf)}`;
 
-  const required = ['id', 'from', 'to', 'amount', 'nonce', 'createdAt', 'signature'];
+  const required = ['id', 'from', 'to', 'amount', 'nonce', 'sigVersion', 'createdAt', 'signature'];
   for (const key of required) if (!(key in tx)) fail(`${ctx}: missing ${key}`);
 
   if (txIds.has(tx.id)) fail(`${ctx}: duplicate tx id ${tx.id}`);
@@ -133,6 +134,7 @@ for (const tf of txFiles) {
   if (!wallets.has(tx.to)) fail(`${ctx}: receiver wallet ${tx.to} not registered`);
   if (!Number.isInteger(tx.amount) || tx.amount < 1) fail(`${ctx}: amount must be integer >= 1`);
   if (!Number.isInteger(tx.nonce) || tx.nonce < 1) fail(`${ctx}: nonce must be integer >= 1`);
+  if (tx.sigVersion !== 1) fail(`${ctx}: sigVersion must be 1`);
 
   const expectedNonce = (nonces[tx.from] || 0) + 1;
   if (tx.nonce !== expectedNonce) {

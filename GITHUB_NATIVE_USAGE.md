@@ -31,6 +31,7 @@ Create `wallets/<your-github-username>.json`:
 ### Fast path (CLI helper)
 
 ```bash
+node scripts/sequin_cli.js tx:next-nonce --user <you>
 node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello sequin"
 ```
 
@@ -47,6 +48,7 @@ Open a PR containing that tx file.
   "to": "recipient-username",
   "amount": 10,
   "nonce": 1,
+  "sigVersion": 1,
   "memo": "hello sequin",
   "createdAt": "2026-03-13T12:05:00Z",
   "signature": "BASE64_SIG"
@@ -63,6 +65,13 @@ Open a PR containing that tx file.
   - Ed25519 signature against canonical payload
 - after merge, `rebuild-ledger` applies pending tx into a new block and updates balances/nonces.
 
+### Nonce collision policy
+
+If two PRs race on the same sender nonce, the later PR should:
+1. rebase onto latest `master`
+2. regenerate tx with the next nonce
+3. rerun checks
+
 ## Canonical signed payload
 
 The signature is over this exact JSON object (stringified with stable key order):
@@ -74,6 +83,7 @@ The signature is over this exact JSON object (stringified with stable key order)
   "to": "...",
   "amount": 1,
   "nonce": 1,
+  "sigVersion": 1,
   "memo": "",
   "createdAt": "..."
 }
@@ -87,6 +97,12 @@ The signature is over this exact JSON object (stringified with stable key order)
   1. generates daily reward manifest `rewards/YYYY-MM-DD.json` from merged PR activity
   2. mints it directly into ledger state via `scripts/mint_rewards.js`
   3. commits new reward block + balance updates
+
+### Epoch semantics
+
+Reward scoring uses **UTC calendar days**:
+- start: `YYYY-MM-DDT00:00:00Z`
+- end: `YYYY-MM-DDT23:59:59Z`
 
 ## Notes
 

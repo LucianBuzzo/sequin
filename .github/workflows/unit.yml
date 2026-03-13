@@ -2,28 +2,32 @@ name: CI
 
 on:
   push:
-    branches:
-    - master
+    branches: [master]
   pull_request:
-    branches:
-    - master
+    branches: [master]
 
 jobs:
   unit:
     name: Run unit tests
     runs-on: ubuntu-latest
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Install system deps for Crystal linking
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyaml-dev libevent-dev libpcre3-dev
 
       - uses: MeilCli/setup-crystal-action@v4
         with:
           crystal_version: 0.35.1
           shards_version: 0.11.1
-      - name: Run Crystal
+
+      - name: Run unit tests
         env:
           BALENA_DEVICE_UUID: test
           PASSWORD: test
         run: |
-          shards install && make test
+          shards install
+          make test

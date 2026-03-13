@@ -3,7 +3,7 @@
   "$id": "https://sequin.local/schemas/tx.schema.json",
   "title": "Sequin Transaction",
   "type": "object",
-  "required": ["id", "from", "to", "amount", "nonce", "createdAt", "signature"],
+  "required": ["id", "from", "to", "amount", "nonce", "sigVersion", "createdAt", "signature"],
   "additionalProperties": false,
   "properties": {
     "id": {
@@ -27,6 +27,10 @@
     "nonce": {
       "type": "integer",
       "minimum": 1
+    },
+    "sigVersion": {
+      "type": "integer",
+      "const": 1
     },
     "memo": {
       "type": "string",
