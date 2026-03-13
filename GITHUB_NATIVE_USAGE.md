@@ -81,7 +81,18 @@ The signature is over this exact JSON object (stringified with stable key order)
 
 (`signature` itself is excluded from signed payload.)
 
+## Nightly rewards (manifest + auto-mint)
+
+- `nightly-rewards.yml` now:
+  1. generates daily reward manifest `rewards/YYYY-MM-DD.json` from merged PR activity
+  2. mints it directly into ledger state via `scripts/mint_rewards.js`
+  3. commits new reward block + balance updates
+
 ## Notes
 
-- Reward PR generation is scaffolded in `nightly-rewards.yml` and still needs PoPR scoring implementation.
+- Current anti-gaming profile is **medium**:
+  - ignores tiny PRs (`< 10` changed lines)
+  - excludes known bot accounts
+  - penalizes self-merge
+  - caps scored PRs/user/day and total score/user/day
 - This is V1 scaffold; branch protection + required checks should be enabled before broad use.
