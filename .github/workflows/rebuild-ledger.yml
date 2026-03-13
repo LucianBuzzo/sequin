@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify chain structure
+        run: node scripts/verify_chain.js
       - name: Verify pending tx
         run: node scripts/verify_tx.js
       - name: Apply new block from pending tx

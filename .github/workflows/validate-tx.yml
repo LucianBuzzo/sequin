@@ -17,5 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Validate chain structure
+        run: node scripts/verify_chain.js
       - name: Validate pending tx and wallets
         run: node scripts/verify_tx.js
