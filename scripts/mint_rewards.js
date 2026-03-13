@@ -32,8 +32,12 @@ const date = arg('--date') || new Date(Date.now() - 24 * 3600 * 1000).toISOStrin
 const rewardPath = path.join(root, 'rewards', `${date}.json`);
 if (!fs.existsSync(rewardPath)) fail(`Missing reward manifest: ${rewardPath}`);
 
+const cfgPath = path.join(root, 'config', 'reward-repos.json');
+const cfg = fs.existsSync(cfgPath) ? readJson(cfgPath) : {};
+
 const reward = readJson(rewardPath);
 if (!Array.isArray(reward.rewards)) fail('Reward manifest missing rewards array');
+if (!reward.totals || typeof reward.totals !== 'object') fail('Reward manifest missing totals');
 
 const balances = fs.existsSync(balancesPath) ? readJson(balancesPath) : {};
 const meta = fs.existsSync(metaPath)
@@ -44,6 +48,24 @@ const applied = fs.existsSync(appliedPath) ? readJson(appliedPath) : [];
 if (applied.includes(date)) {
   console.log(`Reward epoch ${date} already minted; nothing to do.`);
   process.exit(0);
+}
+
+const distributed = reward.rewards.reduce((acc, r) => acc + (Number.isInteger(r.amount) ? r.amount : 0), 0);
+const expectedEmission = Number.isInteger(reward.totals.dailyEmission)
+  ? reward.totals.dailyEmission
+  : Number.isInteger(cfg.dailyEmission)
+    ? cfg.dailyEmission
+    : null;
+if (expectedEmission !== null && distributed > expectedEmission) {
+  fail(`Distributed rewards ${distributed} exceed emission cap ${expectedEmission}`);
+}
+
+const maxRewardPerUser = Number.isInteger(cfg.maxRewardPerUser) ? cfg.maxRewardPerUser : null;
+if (maxRewardPerUser !== null) {
+  const violator = reward.rewards.find((r) => Number.isInteger(r.amount) && r.amount > maxRewardPerUser);
+  if (violator) {
+    fail(`Reward ${violator.amount} for ${violator.github} exceeds per-user cap ${maxRewardPerUser}`);
+  }
 }
 
 for (const r of reward.rewards) {

@@ -103,6 +103,13 @@ async function main() {
     points.set(login, Math.min(cfg.maxScorePerUser || 120, total));
   }
 
+  const mergedPrCount = detail.length;
+  const day = new Date(`${date}T00:00:00Z`).getUTCDay(); // 0=Sun..6=Sat
+  const isWeekday = day >= 1 && day <= 5;
+  if ((cfg.abortIfNoMergedPRsOnWeekday ?? true) && isWeekday && mergedPrCount === 0) {
+    throw new Error(`No merged PR activity found for weekday epoch ${date}; aborting mint pipeline`);
+  }
+
   const totalScore = Array.from(points.values()).reduce((a, b) => a + b, 0);
   const rewards = [];
   if (totalScore > 0) {
@@ -124,6 +131,7 @@ async function main() {
     },
     totals: {
       contributors: rewards.length,
+      mergedPrCount,
       totalScore: Number(totalScore.toFixed(2)),
       dailyEmission: cfg.dailyEmission,
       distributed: rewards.reduce((a, r) => a + r.amount, 0)

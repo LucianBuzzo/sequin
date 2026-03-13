@@ -8,5 +8,7 @@
   ],
   "dailyEmission": 10000,
   "maxPRsPerUser": 5,
-  "maxScorePerUser": 120
+  "maxScorePerUser": 120,
+  "maxRewardPerUser": 3000,
+  "abortIfNoMergedPRsOnWeekday": true
 }
