@@ -16,3 +16,6 @@
 
 # super-linter
 super-linter.log
+
+# local sequin wallet keys
+.sequin/
