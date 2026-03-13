@@ -95,4 +95,8 @@ The signature is over this exact JSON object (stringified with stable key order)
   - excludes known bot accounts
   - penalizes self-merge
   - caps scored PRs/user/day and total score/user/day
+- Mint safety guardrails:
+  - aborts if distributed rewards exceed configured daily emission
+  - aborts if any single user reward exceeds `maxRewardPerUser`
+  - optional weekday guard can abort when zero merged PR activity is detected
 - This is V1 scaffold; branch protection + required checks should be enabled before broad use.
