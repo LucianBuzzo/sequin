@@ -1,0 +1,21 @@
+name: validate-tx
+
+on:
+  pull_request:
+    paths:
+      - 'wallets/**'
+      - 'tx/pending/**'
+      - 'ledger/state/**'
+      - 'schemas/**'
+      - 'scripts/verify_tx.js'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate pending tx and wallets
+        run: node scripts/verify_tx.js

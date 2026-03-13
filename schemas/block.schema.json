@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sequin.local/schemas/block.schema.json",
+  "title": "Sequin Block",
+  "type": "object",
+  "required": ["height", "prevHash", "txIds", "timestamp", "proposer"],
+  "additionalProperties": false,
+  "properties": {
+    "height": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "prevHash": {
+      "type": ["string", "null"]
+    },
+    "txIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "proposer": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
