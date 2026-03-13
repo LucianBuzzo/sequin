@@ -18,6 +18,8 @@ function arg(name) {
 
 const date = arg('--date') || new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10);
 const token = process.env.GITHUB_TOKEN;
+const epochStartUtc = `${date}T00:00:00Z`;
+const epochEndUtc = `${date}T23:59:59Z`;
 
 function scorePR(pr) {
   const lines = (pr.additions || 0) + (pr.deletions || 0);
@@ -47,7 +49,7 @@ async function gh(pathname) {
 }
 
 async function mergedPRNumbers(repo) {
-  // Search issues endpoint for merged PRs in date window.
+  // Search issues endpoint for merged PRs in the UTC epoch day window.
   const q = encodeURIComponent(`repo:${repo} is:pr is:merged merged:${date}..${date}`);
   const data = await gh(`/search/issues?q=${q}&per_page=100`);
   return (data.items || []).map((item) => {
@@ -122,6 +124,8 @@ async function main() {
 
   const out = {
     epoch: date,
+    epochStartUtc,
+    epochEndUtc,
     generatedAt: new Date().toISOString(),
     config: {
       repos: cfg.repos,

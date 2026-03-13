@@ -10,6 +10,7 @@ function usage() {
   console.log(`
 Usage:
   node scripts/sequin_cli.js wallet:create --github <username>
+  node scripts/sequin_cli.js tx:next-nonce --user <username>
   node scripts/sequin_cli.js tx:sign --from <username> --to <username> --amount <int> --nonce <int> [--memo "..."]
 
 Notes:
@@ -41,6 +42,7 @@ function canonicalTx(tx) {
     to: tx.to,
     amount: tx.amount,
     nonce: tx.nonce,
+    sigVersion: tx.sigVersion,
     memo: tx.memo || '',
     createdAt: tx.createdAt,
   });
@@ -81,6 +83,14 @@ function txId() {
   return crypto.randomBytes(8).toString('hex');
 }
 
+function cmdTxNextNonce() {
+  const user = arg('--user', true);
+  const noncesPath = path.join(root, 'ledger', 'state', 'nonces.json');
+  const nonces = fs.existsSync(noncesPath) ? JSON.parse(fs.readFileSync(noncesPath, 'utf8')) : {};
+  const next = (nonces[user] || 0) + 1;
+  console.log(next);
+}
+
 function cmdTxSign() {
   const from = arg('--from', true);
   const to = arg('--to', true);
@@ -104,6 +114,7 @@ function cmdTxSign() {
     to,
     amount,
     nonce,
+    sigVersion: 1,
     memo,
     createdAt: new Date().toISOString(),
   };
@@ -128,6 +139,7 @@ function main() {
   }
 
   if (cmd === 'wallet:create') return cmdWalletCreate();
+  if (cmd === 'tx:next-nonce') return cmdTxNextNonce();
   if (cmd === 'tx:sign') return cmdTxSign();
 
   throw new Error(`Unknown command: ${cmd}`);
