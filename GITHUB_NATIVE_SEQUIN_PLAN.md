@@ -59,6 +59,12 @@ Main branch is the canonical chain.
 - [x] Run validation locally (schema + deterministic state rebuild)
 - [ ] Open PR with V1 scaffold
 
+## Progress notes
+
+- Added real Ed25519 signature verification to `scripts/verify_tx.js` using canonical tx payload.
+- Added local helper CLI `scripts/sequin_cli.js` for wallet creation and tx signing.
+- Ran a local smoke cycle (wallet create -> sign tx -> verify -> apply block) and reset repo state back to clean genesis.
+
 ---
 
 ## Implementation Notes

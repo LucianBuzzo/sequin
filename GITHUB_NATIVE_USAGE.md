@@ -2,8 +2,21 @@
 
 ## Register a wallet via PR
 
-1. Generate an Ed25519 keypair locally (private key never leaves your machine).
-2. Create `wallets/<your-github-username>.json`:
+### Fast path (CLI helper)
+
+```bash
+node scripts/sequin_cli.js wallet:create --github <your-github-username>
+```
+
+This creates:
+- public wallet file: `wallets/<username>.json` (commit this)
+- private key: `.sequin/keys/<username>.key` (**never commit this**)
+
+Then open a PR with the wallet file.
+
+### Manual path
+
+Create `wallets/<your-github-username>.json`:
 
 ```json
 {
@@ -13,13 +26,19 @@
 }
 ```
 
-3. Open a PR with that file.
-4. `validate-tx` must pass.
-5. Merge PR to register wallet.
-
 ## Send sequins via PR
 
-1. Build a signed tx JSON in `tx/pending/`:
+### Fast path (CLI helper)
+
+```bash
+node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello sequin"
+```
+
+This writes a signed tx file to `tx/pending/*.json`.
+
+Open a PR containing that tx file.
+
+### Manual tx format
 
 ```json
 {
@@ -34,11 +53,35 @@
 }
 ```
 
-2. Open PR with tx file.
-3. `validate-tx` checks nonce/balance/wallet + basic tx invariants.
-4. After merge, `rebuild-ledger` applies tx into a new block and updates balances/nonces.
+## Validation and merge behavior
+
+- `validate-tx` checks:
+  - wallet filename ↔ github field match
+  - registered sender/receiver wallets
+  - nonce progression (`current + 1`)
+  - sufficient sender balance
+  - Ed25519 signature against canonical payload
+- after merge, `rebuild-ledger` applies pending tx into a new block and updates balances/nonces.
+
+## Canonical signed payload
+
+The signature is over this exact JSON object (stringified with stable key order):
+
+```json
+{
+  "id": "...",
+  "from": "...",
+  "to": "...",
+  "amount": 1,
+  "nonce": 1,
+  "memo": "",
+  "createdAt": "..."
+}
+```
+
+(`signature` itself is excluded from signed payload.)
 
 ## Notes
 
-- Signature crypto verification is currently TODO in scaffold (`scripts/verify_tx.js`).
 - Reward PR generation is scaffolded in `nightly-rewards.yml` and still needs PoPR scoring implementation.
+- This is V1 scaffold; branch protection + required checks should be enabled before broad use.
