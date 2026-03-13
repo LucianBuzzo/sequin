@@ -19,9 +19,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libyaml-dev libevent-dev libpcre3-dev
 
-      - uses: crystal-lang/install-crystal@v1
+      - uses: MeilCli/setup-crystal-action@v4
         with:
-          crystal: 1.13.3
+          crystal_version: 0.35.1
+          shards_version: 0.11.1
 
       - name: Run unit tests
         env:
