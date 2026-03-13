@@ -39,8 +39,8 @@ Main branch is the canonical chain.
 
 ### Reward lifecycle
 1. Nightly action scores merged PR activity
-2. Action opens reward PR with `rewards/YYYY-MM-DD.json`
-3. Merge applies coinbase rewards
+2. Action writes `rewards/YYYY-MM-DD.json`
+3. Action auto-mints rewards into ledger in the same run (manifest + auto-mint)
 
 ---
 

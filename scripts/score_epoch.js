@@ -21,6 +21,9 @@ const token = process.env.GITHUB_TOKEN;
 
 function scorePR(pr) {
   const lines = (pr.additions || 0) + (pr.deletions || 0);
+  // Medium anti-gaming baseline: ignore tiny edits.
+  if (lines < 10) return 0;
+
   const base = 10;
   const size = Math.min(20, Math.log(1 + lines) * 3.5);
   const files = Math.min(8, (pr.changed_files || 0) * 0.5);

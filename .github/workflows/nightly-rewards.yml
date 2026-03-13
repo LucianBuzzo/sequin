@@ -10,13 +10,14 @@ on:
         required: false
 
 jobs:
-  reward-pr:
+  reward-mint:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -30,16 +31,27 @@ jobs:
           else
             node scripts/score_epoch.js
           fi
-      - name: Open reward PR
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: bot/nightly-rewards
-          title: "chore(rewards): nightly PoPR reward manifest"
-          body: |
-            Automated nightly reward manifest generated from merged PR activity.
-
-            This includes:
-            - scorer config snapshot
-            - per-user reward allocations
-            - per-PR scoring details for auditability
-          commit-message: "chore(rewards): generate nightly PoPR reward manifest"
+      - name: Mint rewards into ledger
+        env:
+          INPUT_DATE: ${{ github.event.inputs.date }}
+        run: |
+          if [ -n "${INPUT_DATE}" ]; then
+            node scripts/mint_rewards.js --date "${INPUT_DATE}"
+          else
+            node scripts/mint_rewards.js
+          fi
+      - name: Verify chain + tx state
+        run: |
+          node scripts/verify_chain.js
+          node scripts/verify_tx.js
+      - name: Commit nightly reward/mint updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rewards ledger/state ledger/blocks
+          if git diff --cached --quiet; then
+            echo "No reward mint changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(rewards): generate and mint nightly epoch"
+          git push
