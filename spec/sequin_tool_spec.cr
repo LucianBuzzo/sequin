@@ -2,6 +2,7 @@ require "file_utils"
 require "spec"
 require "json"
 require "../src/sequin_tool/cli"
+require "../src/sequin_tool/commands/score_epoch"
 
 private def with_tmp_repo
   dir = File.join(Dir.tempdir, "sequin-spec-#{Random::Secure.hex(6)}")
@@ -10,6 +11,21 @@ private def with_tmp_repo
     yield dir
   ensure
     FileUtils.rm_rf(dir)
+  end
+end
+
+private class FakeScoreClient
+  include SequinTool::Commands::ScoreEpoch::Client
+
+  def initialize(@repo_numbers : Hash(String, Array(Int32)), @pulls : Hash(String, JSON::Any))
+  end
+
+  def merged_pr_numbers(repo : String, date : String) : Array(Int32)
+    @repo_numbers[repo]? || [] of Int32
+  end
+
+  def load_pr(repo : String, number : Int32) : JSON::Any
+    @pulls["#{repo}##{number}"]
   end
 end
 
@@ -156,6 +172,47 @@ describe SequinTool::CLI do
 
       epochs = JSON.parse(File.read(File.join(root, "ledger", "state", "reward_epochs.json"))).as_a
       epochs.map(&.as_s).should contain("2026-03-13")
+    end
+  end
+
+  it "scores epoch rewards from github activity" do
+    with_tmp_repo do |root|
+      Dir.mkdir_p(File.join(root, "config"))
+      Dir.mkdir_p(File.join(root, "rewards"))
+
+      File.write(File.join(root, "config", "reward-repos.json"), {
+        "repos" => ["owner/repo"],
+        "excludeLogins" => ["dependabot[bot]"],
+        "dailyEmission" => 10000,
+        "maxPRsPerUser" => 5,
+        "maxScorePerUser" => 120,
+        "abortIfNoMergedPRsOnWeekday" => false,
+      }.to_pretty_json + "\n")
+
+      pr = {
+        "number" => 1,
+        "title" => "Add feature",
+        "user" => {"login" => "alice"},
+        "additions" => 40,
+        "deletions" => 5,
+        "changed_files" => 3,
+        "draft" => false,
+        "merged_by" => {"login" => "reviewer"},
+      }
+
+      client = FakeScoreClient.new(
+        {"owner/repo" => [1]},
+        {"owner/repo#1" => JSON.parse(pr.to_json)}
+      )
+
+      cmd = SequinTool::Commands::ScoreEpoch.new(IO::Memory.new, IO::Memory.new, client)
+      cmd.call("2026-03-13", root).should eq(0)
+
+      out = JSON.parse(File.read(File.join(root, "rewards", "2026-03-13.json"))).as_h
+      out["epoch"].as_s.should eq("2026-03-13")
+      out["rewards"].as_a.size.should eq(1)
+      out["rewards"].as_a[0].as_h["github"].as_s.should eq("alice")
+      out["totals"].as_h["mergedPrCount"].as_i.should eq(1)
     end
   end
 

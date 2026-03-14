@@ -96,13 +96,13 @@ Subcommands (empty or stubbed initially):
 ## Phase 4 — Port GitHub Epoch Scoring (Medium Risk)
 
 ### 4.1 Score engine
-- [ ] Port `scripts/score_epoch.js` → Crystal `rewards:score-epoch`
-- [ ] Keep scoring constants/config in `config/reward-repos.json`
+- [x] Port `scripts/score_epoch.js` → Crystal `rewards:score-epoch`
+- [x] Keep scoring constants/config in `config/reward-repos.json`
 
 ### 4.2 Hardening
-- [ ] Implement pagination for GitHub API responses
-- [ ] Add retry/backoff for transient API failures
-- [ ] Add clear failure messaging for missing token/rate-limit
+- [x] Implement pagination for GitHub API responses
+- [x] Add retry/backoff for transient API failures
+- [x] Add clear failure messaging for missing token/rate-limit
 
 **Acceptance:** output manifest matches expected structure + deterministic test snapshot.
 
@@ -184,7 +184,7 @@ Run end-to-end in dry run and real flow:
 - [x] PR-1: Toolchain upgrade + AGENTS/MIGRATION docs
 - [x] PR-2: `sequin_tool` skeleton + shared libs
 - [x] PR-3: deterministic ledger ops port
-- [ ] PR-4: epoch scoring port + hardening
+- [x] PR-4: epoch scoring port + hardening
 - [ ] PR-5: crypto + tx tooling port
 - [ ] PR-6: workflow cutover
 - [ ] PR-7: remove legacy server + JS scripts
