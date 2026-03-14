@@ -78,7 +78,7 @@ Subcommands (empty or stubbed initially):
 ## Phase 3 — Port Deterministic Ledger Operations (Low Risk)
 
 ### 3.1 Chain verification
-- [ ] Port `scripts/verify_chain.js` → Crystal `verify:chain`
+- [x] Port `scripts/verify_chain.js` → Crystal `verify:chain`
 
 ### 3.2 Apply block
 - [ ] Port `scripts/apply_block.js` → Crystal `ledger:apply-block`
@@ -87,7 +87,7 @@ Subcommands (empty or stubbed initially):
 - [ ] Port `scripts/mint_rewards.js` → Crystal `rewards:mint`
 
 ### 3.4 Summary/reporting
-- [ ] Port `scripts/ledger_summary.js` → Crystal `ledger:summary`
+- [x] Port `scripts/ledger_summary.js` → Crystal `ledger:summary`
 
 **Acceptance:** parity tests pass against existing fixture data.
 
