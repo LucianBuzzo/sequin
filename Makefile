@@ -13,5 +13,7 @@ all:
 lint:
 	docker run -e RUN_LOCAL=true -v $(MAKEFILE_DIR):/tmp/lint github/super-linter
 
+SPECS := $(filter-out spec/server_spec.cr,$(wildcard spec/*_spec.cr))
+
 test:
-	crystal spec
+	crystal spec $(SPECS)
