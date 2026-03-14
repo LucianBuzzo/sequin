@@ -29,4 +29,4 @@ jobs:
           PASSWORD: test
         run: |
           shards install
-          make test
+          crystal spec
