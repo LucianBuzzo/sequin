@@ -1,5 +1,3 @@
-require "./server"
+require "./sequin_tool"
 
-sequin = Server.new
-
-sequin.start_miner
+exit SequinTool::CLI.new.run(ARGV)
