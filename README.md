@@ -96,6 +96,8 @@ Config: `config/reward-repos.json`
 
 ## Local usage
 
+Crystal-based commands and specs are currently verified against Crystal `1.13.2`.
+
 ### CLI helper
 
 ```bash
