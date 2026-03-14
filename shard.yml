@@ -7,15 +7,7 @@ authors:
 dependencies:
   secp256k1:
     github: q9f/secp256k1.cr
-    version: ~> 0.3
-
-  kemal:
-    github: kemalcr/kemal
-    version: ~> 0.27.0
-
-  crest:
-    github: mamantoha/crest
-    version: 0.26.4
+    version: ">= 0.3.0, < 0.4.0"
 
 targets:
   sequin_tool:
