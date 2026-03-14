@@ -18,31 +18,40 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install system deps for Crystal linking
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyaml-dev libevent-dev libpcre3-dev
+      - uses: MeilCli/setup-crystal-action@v4
+        with:
+          crystal_version: 1.13.2
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install Crystal dependencies
+        run: shards install
       - name: Generate reward manifest from merged PR activity
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_DATE: ${{ github.event.inputs.date }}
         run: |
           if [ -n "${INPUT_DATE}" ]; then
-            node scripts/score_epoch.js --date "${INPUT_DATE}"
+            crystal run src/sequin_tool.cr -- rewards:score-epoch --date "${INPUT_DATE}"
           else
-            node scripts/score_epoch.js
+            crystal run src/sequin_tool.cr -- rewards:score-epoch
           fi
       - name: Mint rewards into ledger
         env:
           INPUT_DATE: ${{ github.event.inputs.date }}
         run: |
           if [ -n "${INPUT_DATE}" ]; then
-            node scripts/mint_rewards.js --date "${INPUT_DATE}"
+            crystal run src/sequin_tool.cr -- rewards:mint --date "${INPUT_DATE}"
           else
-            node scripts/mint_rewards.js
+            crystal run src/sequin_tool.cr -- rewards:mint
           fi
       - name: Verify chain + tx state
         run: |
-          node scripts/verify_chain.js
+          crystal run src/sequin_tool.cr -- verify:chain
           node scripts/verify_tx.js
       - name: Commit nightly reward/mint updates
         run: |

@@ -136,10 +136,10 @@ Subcommands (empty or stubbed initially):
 - [ ] Replace Node steps with Crystal command invocations in `validate-tx.yml`
 
 ### 6.2 Rebuild ledger workflow
-- [ ] Replace Node steps with Crystal command invocations in `rebuild-ledger.yml`
+- [x] Replace Node steps with Crystal command invocations in `rebuild-ledger.yml` *(except pending tx verification, still Node until `verify:tx` is ported)*
 
 ### 6.3 Nightly rewards workflow
-- [ ] Replace Node steps with Crystal command invocations in `nightly-rewards.yml`
+- [x] Replace Node steps with Crystal command invocations in `nightly-rewards.yml` *(except tx verification, still Node until `verify:tx` is ported)*
 
 ### 6.4 CI ergonomics
 - [ ] Add build/cache strategy for Crystal binary to keep workflow duration sane
