@@ -17,6 +17,10 @@ dependencies:
     github: mamantoha/crest
     version: 0.26.4
 
+targets:
+  sequin_tool:
+    main: src/sequin_tool.cr
+
 crystal: 1.13.2
 
 license: MIT
