@@ -7,7 +7,7 @@ on:
       - 'tx/pending/**'
       - 'ledger/state/**'
       - 'schemas/**'
-      - 'scripts/verify_tx.js'
+      - 'src/sequin_tool/commands/verify_tx.cr'
 
 jobs:
   validate:
@@ -21,9 +21,6 @@ jobs:
       - uses: MeilCli/setup-crystal-action@v4
         with:
           crystal_version: 1.13.2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - name: Cache Crystal shards
         uses: actions/cache@v4
         with:
@@ -38,4 +35,4 @@ jobs:
       - name: Validate chain structure
         run: crystal run src/sequin_tool.cr -- verify:chain
       - name: Validate pending tx and wallets
-        run: node scripts/verify_tx.js
+        run: crystal run src/sequin_tool.cr -- verify:tx

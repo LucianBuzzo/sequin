@@ -25,9 +25,6 @@ jobs:
       - uses: MeilCli/setup-crystal-action@v4
         with:
           crystal_version: 1.13.2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - name: Cache Crystal shards
         uses: actions/cache@v4
         with:
@@ -61,7 +58,7 @@ jobs:
       - name: Verify chain + tx state
         run: |
           crystal run src/sequin_tool.cr -- verify:chain
-          node scripts/verify_tx.js
+          crystal run src/sequin_tool.cr -- verify:tx
       - name: Commit nightly reward/mint updates
         run: |
           git config user.name "github-actions[bot]"

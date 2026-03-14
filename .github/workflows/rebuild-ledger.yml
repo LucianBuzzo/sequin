@@ -20,9 +20,6 @@ jobs:
       - uses: MeilCli/setup-crystal-action@v4
         with:
           crystal_version: 1.13.2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - name: Cache Crystal shards
         uses: actions/cache@v4
         with:
@@ -37,7 +34,7 @@ jobs:
       - name: Verify chain structure
         run: crystal run src/sequin_tool.cr -- verify:chain
       - name: Verify pending tx
-        run: node scripts/verify_tx.js
+        run: crystal run src/sequin_tool.cr -- verify:tx
       - name: Apply new block from pending tx
         run: crystal run src/sequin_tool.cr -- ledger:apply-block
       - name: Commit ledger updates (if any)
