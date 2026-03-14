@@ -23,6 +23,16 @@ jobs:
         with:
           crystal_version: 1.13.2
 
+      - name: Cache Crystal shards
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib
+            ~/.cache/shards
+          key: shards-${{ runner.os }}-${{ hashFiles('shard.lock', 'shard.yml') }}
+          restore-keys: |
+            shards-${{ runner.os }}-
+
       - name: Run unit tests
         env:
           BALENA_DEVICE_UUID: test

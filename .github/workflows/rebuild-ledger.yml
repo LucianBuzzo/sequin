@@ -23,6 +23,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Cache Crystal shards
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib
+            ~/.cache/shards
+          key: shards-${{ runner.os }}-${{ hashFiles('shard.lock', 'shard.yml') }}
+          restore-keys: |
+            shards-${{ runner.os }}-
       - name: Install Crystal dependencies
         run: shards install
       - name: Verify chain structure
