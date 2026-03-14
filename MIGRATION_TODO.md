@@ -5,9 +5,9 @@
 ## Definition of Done
 
 - [x] No Node runtime required for core CI/workflows
-- [ ] GitHub-backed ledger flow fully handled by Crystal tooling
+- [x] GitHub-backed ledger flow fully handled by Crystal tooling
 - [x] Legacy server/miner path removed
-- [ ] Docs reflect one canonical architecture
+- [x] Docs reflect one canonical architecture
 
 ---
 
@@ -157,11 +157,11 @@ Subcommands (empty or stubbed initially):
 - [x] Remove related deps/config/docs
 
 ### 7.2 Remove JS scaffolding
-- [ ] Delete migrated JS scripts
-- [ ] Remove JS-specific lint checks
+- [x] Delete migrated JS scripts
+- [x] Remove JS-specific lint checks
 
 ### 7.3 Docs cleanup
-- [ ] Update README to single canonical architecture
+- [x] Update README to single canonical architecture
 - [ ] Add migration notes/changelog entries
 
 **Acceptance:** repo has one runtime model (Crystal + GitHub-backed workflows).
@@ -189,7 +189,7 @@ Run end-to-end in dry run and real flow:
 - [x] PR-4: epoch scoring port + hardening
 - [x] PR-5: crypto + tx tooling port
 - [x] PR-6: workflow cutover
-- [ ] PR-7: remove legacy server + JS scripts
+- [x] PR-7: remove legacy server + JS scripts
 - [ ] PR-8: final cleanup/docs + release
 
 ---

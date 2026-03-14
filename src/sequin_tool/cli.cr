@@ -4,6 +4,7 @@ require "./commands/apply_block"
 require "./commands/ledger_summary"
 require "./commands/mint_rewards"
 require "./commands/score_epoch"
+require "./commands/repo_lint"
 require "./commands/tx_next_nonce"
 require "./commands/tx_sign"
 require "./commands/verify_chain"
@@ -18,9 +19,7 @@ module SequinTool
     getter commands : Array(Command)
 
     def initialize
-      @commands = [
-        Command.new("repo:lint", "Run repository integrity checks for GitHub-backed state.", "Command stub only. Repo linting will be filled in during CLI migration.", "Phase 3", exit_code: 1),
-      ]
+      @commands = [] of Command
     end
 
     def run(args : Array(String), stdout : IO = STDOUT, stderr : IO = STDERR, root : String = Dir.current) : Int32
@@ -34,6 +33,8 @@ module SequinTool
       end
 
       case args[0]
+      when "repo:lint"
+        Commands::RepoLint.new(stdout, stderr).call(root)
       when "verify:chain"
         Commands::VerifyChain.new(stdout, stderr).call(root)
       when "verify:tx"
@@ -102,6 +103,7 @@ module SequinTool
       io.puts "  wallet:create         Create a wallet keypair + wallet JSON."
       io.puts "  tx:next-nonce         Print next nonce for a user."
       io.puts "  tx:sign               Sign transfer tx JSON into tx/pending."
+      io.puts "  repo:lint             Validate repository JSON integrity."
       io.puts "  ledger:summary        Print a ledger summary report."
       io.puts "  ledger:apply-block    Apply pending transactions into ledger state."
       io.puts "  rewards:mint          Mint a reward manifest into ledger state."
@@ -148,6 +150,9 @@ module SequinTool
         stdout.puts "tx:sign - Sign tx payload and write tx/pending/*.json."
         stdout.puts
         stdout.puts "Options: --from <user> --to <user> --amount <int> --nonce <int> [--memo <text>]"
+        return 0
+      when "repo:lint"
+        stdout.puts "repo:lint - Validate repository JSON integrity."
         return 0
       when "ledger:summary"
         stdout.puts "ledger:summary - Print ledger summary."
