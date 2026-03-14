@@ -17,6 +17,6 @@ dependencies:
     github: mamantoha/crest
     version: 0.26.4
 
-crystal: 0.35.1
+crystal: 1.13.2
 
 license: MIT
