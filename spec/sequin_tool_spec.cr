@@ -302,6 +302,46 @@ describe SequinTool::CLI do
     end
   end
 
+  it "creates wallet, computes nonce, and signs tx" do
+    with_tmp_repo do |root|
+      Dir.mkdir_p(File.join(root, "ledger", "state"))
+      File.write(File.join(root, "ledger", "state", "nonces.json"), {"alice" => 2}.to_pretty_json + "\n")
+
+      cli = SequinTool::CLI.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      cli.run(["wallet:create", "--github", "alice"], stdout, stderr, root).should eq(0)
+      File.exists?(File.join(root, "wallets", "alice.json")).should be_true
+      File.exists?(File.join(root, ".sequin", "keys", "alice.key")).should be_true
+
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      cli.run(["tx:next-nonce", "--user", "alice"], stdout, stderr, root).should eq(0)
+      stdout.to_s.strip.should eq("3")
+
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      cli.run([
+        "tx:sign",
+        "--from", "alice",
+        "--to", "bob",
+        "--amount", "5",
+        "--nonce", "3",
+        "--memo", "hello",
+      ], stdout, stderr, root).should eq(0)
+
+      pending = Dir.children(File.join(root, "tx", "pending"))
+      pending.size.should eq(1)
+      tx = JSON.parse(File.read(File.join(root, "tx", "pending", pending.first))).as_h
+      tx["from"].as_s.should eq("alice")
+      tx["to"].as_s.should eq("bob")
+      tx["amount"].as_i.should eq(5)
+      tx["nonce"].as_i.should eq(3)
+      tx["signature"].as_s.empty?.should be_false
+    end
+  end
+
   it "returns a structured error for unknown commands" do
     cli = SequinTool::CLI.new
     stdout = IO::Memory.new

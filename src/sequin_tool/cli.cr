@@ -4,8 +4,11 @@ require "./commands/apply_block"
 require "./commands/ledger_summary"
 require "./commands/mint_rewards"
 require "./commands/score_epoch"
+require "./commands/tx_next_nonce"
+require "./commands/tx_sign"
 require "./commands/verify_chain"
 require "./commands/verify_tx"
+require "./commands/wallet_create"
 require "./error_handling"
 require "./fs"
 require "./json_io"
@@ -16,9 +19,6 @@ module SequinTool
 
     def initialize
       @commands = [
-        Command.new("wallet:create", "Create a wallet keypair and public registration payload.", "Command stub only. Wallet creation will be ported in Phase 5.", "Phase 5", exit_code: 1),
-        Command.new("tx:next-nonce", "Compute the next nonce for a wallet.", "Command stub only. Nonce lookup will be ported in Phase 5.", "Phase 5", exit_code: 1),
-        Command.new("tx:sign", "Sign a transfer payload.", "Command stub only. Transaction signing will be ported in Phase 5.", "Phase 5", exit_code: 1),
         Command.new("repo:lint", "Run repository integrity checks for GitHub-backed state.", "Command stub only. Repo linting will be filled in during CLI migration.", "Phase 3", exit_code: 1),
       ]
     end
@@ -38,6 +38,25 @@ module SequinTool
         Commands::VerifyChain.new(stdout, stderr).call(root)
       when "verify:tx"
         Commands::VerifyTx.new(stdout, stderr).call(root)
+      when "wallet:create"
+        github = parse_required_value(args[1..], "--github", stderr)
+        return 1 unless github
+        Commands::WalletCreate.new(stdout, stderr).call(github, root)
+      when "tx:next-nonce"
+        user = parse_required_value(args[1..], "--user", stderr)
+        return 1 unless user
+        Commands::TxNextNonce.new(stdout).call(user, root)
+      when "tx:sign"
+        tx_opts = parse_tx_sign_options(args[1..], stderr)
+        return 1 unless tx_opts
+        Commands::TxSign.new(stdout, stderr).call(
+          tx_opts[:from],
+          tx_opts[:to],
+          tx_opts[:amount],
+          tx_opts[:nonce],
+          tx_opts[:memo],
+          root
+        )
       when "ledger:summary"
         options = parse_ledger_summary_options(args[1..], stderr)
         return 1 unless options
@@ -80,6 +99,9 @@ module SequinTool
       io.puts "Implemented commands:"
       io.puts "  verify:chain          Verify canonical ledger chain state."
       io.puts "  verify:tx             Validate pending tx and wallet state."
+      io.puts "  wallet:create         Create a wallet keypair + wallet JSON."
+      io.puts "  tx:next-nonce         Print next nonce for a user."
+      io.puts "  tx:sign               Sign transfer tx JSON into tx/pending."
       io.puts "  ledger:summary        Print a ledger summary report."
       io.puts "  ledger:apply-block    Apply pending transactions into ledger state."
       io.puts "  rewards:mint          Mint a reward manifest into ledger state."
@@ -112,6 +134,21 @@ module SequinTool
         stdout.puts
         stdout.puts "Validates tx schema fields, ids, nonce/balance progression, and Ed25519 signatures."
         return 0
+      when "wallet:create"
+        stdout.puts "wallet:create - Create local Ed25519 keypair + wallet JSON."
+        stdout.puts
+        stdout.puts "Options: --github <username>"
+        return 0
+      when "tx:next-nonce"
+        stdout.puts "tx:next-nonce - Print next nonce for wallet user."
+        stdout.puts
+        stdout.puts "Options: --user <username>"
+        return 0
+      when "tx:sign"
+        stdout.puts "tx:sign - Sign tx payload and write tx/pending/*.json."
+        stdout.puts
+        stdout.puts "Options: --from <user> --to <user> --amount <int> --nonce <int> [--memo <text>]"
+        return 0
       when "ledger:summary"
         stdout.puts "ledger:summary - Print ledger summary."
         stdout.puts
@@ -139,6 +176,54 @@ module SequinTool
 
       command.help(stdout)
       0
+    end
+
+    private def parse_required_value(args : Array(String), flag : String, stderr : IO) : String?
+      index = args.index(flag)
+      unless index
+        stderr.puts "#{flag} is required"
+        return nil
+      end
+
+      value = args[index + 1]?
+      unless value
+        stderr.puts "#{flag} requires a value"
+        return nil
+      end
+
+      value
+    end
+
+    private def parse_tx_sign_options(args : Array(String), stderr : IO) : NamedTuple(from: String, to: String, amount: Int64, nonce: Int64, memo: String)?
+      from = parse_required_value(args, "--from", stderr)
+      to = parse_required_value(args, "--to", stderr)
+      amount_s = parse_required_value(args, "--amount", stderr)
+      nonce_s = parse_required_value(args, "--nonce", stderr)
+      return nil unless from && to && amount_s && nonce_s
+
+      amount = amount_s.to_i64?
+      nonce = nonce_s.to_i64?
+      unless amount
+        stderr.puts "--amount must be integer"
+        return nil
+      end
+      unless nonce
+        stderr.puts "--nonce must be integer"
+        return nil
+      end
+
+      memo = ""
+      memo_idx = args.index("--memo")
+      if memo_idx
+        memo_val = args[memo_idx + 1]?
+        unless memo_val
+          stderr.puts "--memo requires a value"
+          return nil
+        end
+        memo = memo_val
+      end
+
+      {from: from, to: to, amount: amount, nonce: nonce, memo: memo}
     end
 
     private def parse_ledger_summary_options(args : Array(String), stderr : IO) : Commands::LedgerSummary::Options?

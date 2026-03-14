@@ -6,7 +6,7 @@
 
 - [x] No Node runtime required for core CI/workflows
 - [ ] GitHub-backed ledger flow fully handled by Crystal tooling
-- [ ] Legacy server/miner path removed
+- [x] Legacy server/miner path removed
 - [ ] Docs reflect one canonical architecture
 
 ---
@@ -111,10 +111,10 @@ Subcommands (empty or stubbed initially):
 ## Phase 5 — Port Crypto + TX Tooling (High Risk)
 
 ### 5.1 Wallet + tx CLI
-- [ ] Port `scripts/sequin_cli.js` wallet commands:
-  - [ ] `wallet:create`
-  - [ ] `tx:next-nonce`
-  - [ ] `tx:sign`
+- [x] Port `scripts/sequin_cli.js` wallet commands:
+  - [x] `wallet:create`
+  - [x] `tx:next-nonce`
+  - [x] `tx:sign`
 
 ### 5.2 Tx verifier
 - [x] Port `scripts/verify_tx.js` to Crystal `verify:tx`
@@ -187,8 +187,8 @@ Run end-to-end in dry run and real flow:
 - [x] PR-2: `sequin_tool` skeleton + shared libs
 - [x] PR-3: deterministic ledger ops port
 - [x] PR-4: epoch scoring port + hardening
-- [ ] PR-5: crypto + tx tooling port
-- [ ] PR-6: workflow cutover
+- [x] PR-5: crypto + tx tooling port
+- [x] PR-6: workflow cutover
 - [ ] PR-7: remove legacy server + JS scripts
 - [ ] PR-8: final cleanup/docs + release
 
