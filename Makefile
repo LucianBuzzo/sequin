@@ -1,7 +1,8 @@
 .PHONY: \
 	all\
 	lint\
-	test
+	test\
+	validate-native
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(dir $(MAKEFILE_PATH))
@@ -15,3 +16,8 @@ lint:
 
 test:
 	crystal spec
+
+# Runs fast, GitHub-native validation checks for repo data + scripts
+validate-native:
+	node scripts/lint_repo.js
+	node scripts/verify_chain.js

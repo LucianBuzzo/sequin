@@ -112,6 +112,7 @@ node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 
 ### Validation scripts
 
 ```bash
+make validate-native
 node scripts/verify_chain.js
 node scripts/verify_tx.js
 node scripts/score_epoch.js --date YYYY-MM-DD
