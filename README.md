@@ -131,5 +131,7 @@ node scripts/ledger_summary.js --top 10 --epochs 7
 
 ## Related docs
 
+- `MIGRATION_TODO.md` (Crystal migration execution checklist)
+- `AGENTS.md` (project field notes + guardrails)
 - `GITHUB_NATIVE_SEQUIN_PLAN.md`
 - `GITHUB_NATIVE_USAGE.md`
