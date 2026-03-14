@@ -133,7 +133,7 @@ Subcommands (empty or stubbed initially):
 ## Phase 6 — Workflow Cutover (Node → Crystal)
 
 ### 6.1 Validate tx workflow
-- [ ] Replace Node steps with Crystal command invocations in `validate-tx.yml`
+- [x] Replace Node steps with Crystal command invocations in `validate-tx.yml` *(except pending tx verification, still Node until `verify:tx` is ported)*
 
 ### 6.2 Rebuild ledger workflow
 - [x] Replace Node steps with Crystal command invocations in `rebuild-ledger.yml` *(except pending tx verification, still Node until `verify:tx` is ported)*
@@ -142,7 +142,7 @@ Subcommands (empty or stubbed initially):
 - [x] Replace Node steps with Crystal command invocations in `nightly-rewards.yml` *(except tx verification, still Node until `verify:tx` is ported)*
 
 ### 6.4 CI ergonomics
-- [ ] Add build/cache strategy for Crystal binary to keep workflow duration sane
+- [x] Add build/cache strategy for Crystal binary to keep workflow duration sane *(shards cache enabled; binary build caching can be layered later)*
 
 **Acceptance:** all three workflows green without `setup-node`.
 
