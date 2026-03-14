@@ -14,9 +14,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Install system deps for Crystal linking
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyaml-dev libevent-dev libpcre3-dev
 
-      - name: Validate JSON + JS syntax
-        run: node scripts/lint_repo.js
+      - uses: MeilCli/setup-crystal-action@v4
+        with:
+          crystal_version: 1.13.2
+
+      - name: Cache Crystal shards
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib
+            ~/.cache/shards
+          key: shards-${{ runner.os }}-${{ hashFiles('shard.lock', 'shard.yml') }}
+          restore-keys: |
+            shards-${{ runner.os }}-
+
+      - name: Install Crystal dependencies
+        run: shards install
+
+      - name: Validate repository state files
+        run: crystal run src/sequin_tool.cr -- repo:lint

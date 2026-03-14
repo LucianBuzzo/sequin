@@ -5,7 +5,7 @@
 ### Fast path (CLI helper)
 
 ```bash
-node scripts/sequin_cli.js wallet:create --github <your-github-username>
+crystal run src/sequin_tool.cr -- wallet:create --github <your-github-username>
 ```
 
 This creates:
@@ -31,8 +31,8 @@ Create `wallets/<your-github-username>.json`:
 ### Fast path (CLI helper)
 
 ```bash
-node scripts/sequin_cli.js tx:next-nonce --user <you>
-node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello sequin"
+crystal run src/sequin_tool.cr -- tx:next-nonce --user <you>
+crystal run src/sequin_tool.cr -- tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello sequin"
 ```
 
 This writes a signed tx file to `tx/pending/*.json`.
@@ -95,7 +95,7 @@ The signature is over this exact JSON object (stringified with stable key order)
 
 - `nightly-rewards.yml` now:
   1. generates daily reward manifest `rewards/YYYY-MM-DD.json` from merged PR activity
-  2. mints it directly into ledger state via `scripts/mint_rewards.js`
+  2. mints it directly into ledger state via Crystal `rewards:mint`
   3. commits new reward block + balance updates
 
 ### Epoch semantics

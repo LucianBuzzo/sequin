@@ -42,7 +42,7 @@ wallets/
 tx/pending/
 rewards/
 schemas/
-scripts/
+src/sequin_tool/
 .github/workflows/
 ```
 
@@ -101,22 +101,23 @@ Crystal-based commands and specs are currently verified against Crystal `1.13.2`
 ### CLI helper
 
 ```bash
-node scripts/sequin_cli.js wallet:create --github <your-github-username>
-node scripts/sequin_cli.js tx:next-nonce --user <you>
-node scripts/sequin_cli.js tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello"
+crystal run src/sequin_tool.cr -- wallet:create --github <your-github-username>
+crystal run src/sequin_tool.cr -- tx:next-nonce --user <you>
+crystal run src/sequin_tool.cr -- tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello"
 ```
 
 - Public wallet file: `wallets/<username>.json`
 - Private key path: `.sequin/keys/<username>.key` (gitignored)
 
-### Validation scripts
+### Validation commands
 
 ```bash
-node scripts/verify_chain.js
-node scripts/verify_tx.js
-node scripts/score_epoch.js --date YYYY-MM-DD
-node scripts/mint_rewards.js --date YYYY-MM-DD
-node scripts/ledger_summary.js --top 10 --epochs 7
+crystal run src/sequin_tool.cr -- verify:chain
+crystal run src/sequin_tool.cr -- verify:tx
+crystal run src/sequin_tool.cr -- rewards:score-epoch --date YYYY-MM-DD
+crystal run src/sequin_tool.cr -- rewards:mint --date YYYY-MM-DD
+crystal run src/sequin_tool.cr -- ledger:summary --top 10 --epochs 7
+crystal run src/sequin_tool.cr -- repo:lint
 ```
 
 ---
