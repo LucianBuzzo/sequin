@@ -32,14 +32,14 @@
 ## Phase 1 — Crystal Toolchain Upgrade
 
 ### 1.1 Runtime/tooling modernization
-- [ ] Upgrade Crystal version from `0.35.1` to current stable target
-- [ ] Update `shard.yml` and dependency constraints
-- [ ] Verify `shards install` + test suite locally
+- [x] Upgrade Crystal version from `0.35.1` to current stable target
+- [x] Update `shard.yml` and dependency constraints
+- [x] Verify `shards install` + test suite locally
 
 **Acceptance:** CI `unit` green on upgrade PR.
 
 ### 1.2 Dependency hygiene
-- [ ] Mark `kemal` + `crest` as legacy (temporary)
+- [x] Mark `kemal` + `crest` as legacy (temporary)
 - [ ] Add required deps for:
   - [ ] crypto path
   - [ ] HTTP/GitHub API client robustness
@@ -53,23 +53,23 @@
 
 Create `sequin_tool` (single entrypoint, subcommands).
 
-- [ ] Add command router and shared helpers:
-  - [ ] JSON read/write
-  - [ ] canonical serialization
-  - [ ] fs safety helpers
-  - [ ] structured error output
+- [x] Add command router and shared helpers:
+  - [x] JSON read/write
+  - [x] canonical serialization
+  - [x] fs safety helpers
+  - [x] structured error output
 
 Subcommands (empty or stubbed initially):
-- [ ] `verify:chain`
-- [ ] `verify:tx`
-- [ ] `ledger:apply-block`
-- [ ] `rewards:score-epoch`
-- [ ] `rewards:mint`
-- [ ] `ledger:summary`
-- [ ] `wallet:create`
-- [ ] `tx:next-nonce`
-- [ ] `tx:sign`
-- [ ] `repo:lint`
+- [x] `verify:chain`
+- [x] `verify:tx`
+- [x] `ledger:apply-block`
+- [x] `rewards:score-epoch`
+- [x] `rewards:mint`
+- [x] `ledger:summary`
+- [x] `wallet:create`
+- [x] `tx:next-nonce`
+- [x] `tx:sign`
+- [x] `repo:lint`
 
 **Acceptance:** binary runs and each command returns a clear status.
 
@@ -81,10 +81,10 @@ Subcommands (empty or stubbed initially):
 - [x] Port `scripts/verify_chain.js` → Crystal `verify:chain`
 
 ### 3.2 Apply block
-- [ ] Port `scripts/apply_block.js` → Crystal `ledger:apply-block`
+- [x] Port `scripts/apply_block.js` → Crystal `ledger:apply-block`
 
 ### 3.3 Mint rewards
-- [ ] Port `scripts/mint_rewards.js` → Crystal `rewards:mint`
+- [x] Port `scripts/mint_rewards.js` → Crystal `rewards:mint`
 
 ### 3.4 Summary/reporting
 - [x] Port `scripts/ledger_summary.js` → Crystal `ledger:summary`
@@ -151,8 +151,8 @@ Subcommands (empty or stubbed initially):
 ## Phase 7 — Remove Legacy Paths
 
 ### 7.1 Remove server/miner model
-- [ ] Delete legacy server entrypoints and peer/mining runtime
-- [ ] Remove related deps/config/docs
+- [x] Delete legacy server entrypoints and peer/mining runtime
+- [x] Remove related deps/config/docs
 
 ### 7.2 Remove JS scaffolding
 - [ ] Delete migrated JS scripts
@@ -181,9 +181,9 @@ Run end-to-end in dry run and real flow:
 
 ## PR Plan (Recommended)
 
-- [ ] PR-1: Toolchain upgrade + AGENTS/MIGRATION docs
-- [ ] PR-2: `sequin_tool` skeleton + shared libs
-- [ ] PR-3: deterministic ledger ops port
+- [x] PR-1: Toolchain upgrade + AGENTS/MIGRATION docs
+- [x] PR-2: `sequin_tool` skeleton + shared libs
+- [x] PR-3: deterministic ledger ops port
 - [ ] PR-4: epoch scoring port + hardening
 - [ ] PR-5: crypto + tx tooling port
 - [ ] PR-6: workflow cutover
