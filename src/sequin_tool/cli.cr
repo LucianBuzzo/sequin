@@ -5,6 +5,7 @@ require "./commands/ledger_summary"
 require "./commands/mint_rewards"
 require "./commands/score_epoch"
 require "./commands/verify_chain"
+require "./commands/verify_tx"
 require "./error_handling"
 require "./fs"
 require "./json_io"
@@ -15,7 +16,6 @@ module SequinTool
 
     def initialize
       @commands = [
-        Command.new("verify:tx", "Verify a pending transaction payload.", "Command stub only. Transaction verification will be ported in Phase 5.", "Phase 5", exit_code: 1),
         Command.new("wallet:create", "Create a wallet keypair and public registration payload.", "Command stub only. Wallet creation will be ported in Phase 5.", "Phase 5", exit_code: 1),
         Command.new("tx:next-nonce", "Compute the next nonce for a wallet.", "Command stub only. Nonce lookup will be ported in Phase 5.", "Phase 5", exit_code: 1),
         Command.new("tx:sign", "Sign a transfer payload.", "Command stub only. Transaction signing will be ported in Phase 5.", "Phase 5", exit_code: 1),
@@ -36,6 +36,8 @@ module SequinTool
       case args[0]
       when "verify:chain"
         Commands::VerifyChain.new(stdout, stderr).call(root)
+      when "verify:tx"
+        Commands::VerifyTx.new(stdout, stderr).call(root)
       when "ledger:summary"
         options = parse_ledger_summary_options(args[1..], stderr)
         return 1 unless options
@@ -77,6 +79,7 @@ module SequinTool
       io.puts
       io.puts "Implemented commands:"
       io.puts "  verify:chain          Verify canonical ledger chain state."
+      io.puts "  verify:tx             Validate pending tx and wallet state."
       io.puts "  ledger:summary        Print a ledger summary report."
       io.puts "  ledger:apply-block    Apply pending transactions into ledger state."
       io.puts "  rewards:mint          Mint a reward manifest into ledger state."
@@ -103,6 +106,11 @@ module SequinTool
         stdout.puts "verify:chain - Verify canonical ledger chain state."
         stdout.puts
         stdout.puts "Validates block heights, prevHash linkage, and meta.lastHeight."
+        return 0
+      when "verify:tx"
+        stdout.puts "verify:tx - Validate pending txs and wallet state."
+        stdout.puts
+        stdout.puts "Validates tx schema fields, ids, nonce/balance progression, and Ed25519 signatures."
         return 0
       when "ledger:summary"
         stdout.puts "ledger:summary - Print ledger summary."

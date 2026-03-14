@@ -4,7 +4,7 @@
 
 ## Definition of Done
 
-- [ ] No Node runtime required for core CI/workflows
+- [x] No Node runtime required for core CI/workflows
 - [ ] GitHub-backed ledger flow fully handled by Crystal tooling
 - [ ] Legacy server/miner path removed
 - [ ] Docs reflect one canonical architecture
@@ -117,9 +117,9 @@ Subcommands (empty or stubbed initially):
   - [ ] `tx:sign`
 
 ### 5.2 Tx verifier
-- [ ] Port `scripts/verify_tx.js` to Crystal `verify:tx`
-- [ ] Preserve canonical payload/signature rules
-- [ ] Preserve nonce/balance simulation semantics
+- [x] Port `scripts/verify_tx.js` to Crystal `verify:tx`
+- [x] Preserve canonical payload/signature rules
+- [x] Preserve nonce/balance simulation semantics
 
 ### 5.3 Compatibility checks
 - [ ] Add cross-check tests during migration:
@@ -133,16 +133,18 @@ Subcommands (empty or stubbed initially):
 ## Phase 6 — Workflow Cutover (Node → Crystal)
 
 ### 6.1 Validate tx workflow
-- [x] Replace Node steps with Crystal command invocations in `validate-tx.yml` *(except pending tx verification, still Node until `verify:tx` is ported)*
+- [x] Replace Node steps with Crystal command invocations in `validate-tx.yml`
 
 ### 6.2 Rebuild ledger workflow
-- [x] Replace Node steps with Crystal command invocations in `rebuild-ledger.yml` *(except pending tx verification, still Node until `verify:tx` is ported)*
+- [x] Replace Node steps with Crystal command invocations in `rebuild-ledger.yml`
 
 ### 6.3 Nightly rewards workflow
-- [x] Replace Node steps with Crystal command invocations in `nightly-rewards.yml` *(except tx verification, still Node until `verify:tx` is ported)*
+- [x] Replace Node steps with Crystal command invocations in `nightly-rewards.yml`
 
 ### 6.4 CI ergonomics
 - [x] Add build/cache strategy for Crystal binary to keep workflow duration sane *(shards cache enabled; binary build caching can be layered later)*
+
+**Status note:** validate/rebuild/nightly now run via Crystal `sequin_tool` commands; Node bridge removed from core workflow paths.
 
 **Acceptance:** all three workflows green without `setup-node`.
 
