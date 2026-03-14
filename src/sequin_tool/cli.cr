@@ -3,6 +3,7 @@ require "./command"
 require "./commands/apply_block"
 require "./commands/ledger_summary"
 require "./commands/mint_rewards"
+require "./commands/score_epoch"
 require "./commands/verify_chain"
 require "./error_handling"
 require "./fs"
@@ -15,7 +16,6 @@ module SequinTool
     def initialize
       @commands = [
         Command.new("verify:tx", "Verify a pending transaction payload.", "Command stub only. Transaction verification will be ported in Phase 5.", "Phase 5", exit_code: 1),
-        Command.new("rewards:score-epoch", "Score GitHub activity for a reward epoch.", "Command stub only. Epoch scoring will be ported in Phase 4.", "Phase 4", exit_code: 1),
         Command.new("wallet:create", "Create a wallet keypair and public registration payload.", "Command stub only. Wallet creation will be ported in Phase 5.", "Phase 5", exit_code: 1),
         Command.new("tx:next-nonce", "Compute the next nonce for a wallet.", "Command stub only. Nonce lookup will be ported in Phase 5.", "Phase 5", exit_code: 1),
         Command.new("tx:sign", "Sign a transfer payload.", "Command stub only. Transaction signing will be ported in Phase 5.", "Phase 5", exit_code: 1),
@@ -46,6 +46,10 @@ module SequinTool
         date = parse_date_option(args[1..], stderr)
         return 1 if date == :error
         Commands::MintRewards.new(stdout, stderr).call(date.as(String?), root)
+      when "rewards:score-epoch"
+        date = parse_date_option(args[1..], stderr)
+        return 1 if date == :error
+        Commands::ScoreEpoch.new(stdout, stderr).call(date.as(String?), root)
       else
         command = commands.find { |item| item.name == args[0] }
         unless command
@@ -76,6 +80,7 @@ module SequinTool
       io.puts "  ledger:summary        Print a ledger summary report."
       io.puts "  ledger:apply-block    Apply pending transactions into ledger state."
       io.puts "  rewards:mint          Mint a reward manifest into ledger state."
+      io.puts "  rewards:score-epoch   Score GitHub PR activity into reward manifest."
       io.puts
       io.puts "Stub commands:"
       commands.each do |command|
@@ -109,6 +114,11 @@ module SequinTool
         return 0
       when "rewards:mint"
         stdout.puts "rewards:mint - Mint reward manifest into ledger state."
+        stdout.puts
+        stdout.puts "Options: --date YYYY-MM-DD"
+        return 0
+      when "rewards:score-epoch"
+        stdout.puts "rewards:score-epoch - Score GitHub PR activity into reward manifest."
         stdout.puts
         stdout.puts "Options: --date YYYY-MM-DD"
         return 0
