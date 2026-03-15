@@ -1,3 +1,15 @@
+## Unreleased
+
+### Migration
+
+- Finalized crypto direction for the GitHub-native Crystal flow: `secp256k1` (prototype-first, no backward-compatibility requirement).
+- Migrated wallet generation, tx signing, and tx verification in `sequin_tool` from Ed25519/OpenSSL shell calls to native Crystal secp256k1 usage.
+- Updated wallet schema and usage docs to the secp format:
+  - `pubkey`: `secp256k1:<compressed-pubkey-hex>`
+  - `signature`: `secp256k1:<r_hex>:<s_hex>`
+- Added/updated tests to validate secp256k1 signing + verification flow.
+- Executed full Crystal-only lifecycle dry run in isolated temp repo (wallet create, tx sign/apply, score/mint, verify/summary).
+
 # [1.12.0](https://github.com/LucianBuzzo/sequin/compare/v1.11.0...v1.12.0) (2021-03-06)
 
 

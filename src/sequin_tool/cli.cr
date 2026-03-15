@@ -134,10 +134,10 @@ module SequinTool
       when "verify:tx"
         stdout.puts "verify:tx - Validate pending txs and wallet state."
         stdout.puts
-        stdout.puts "Validates tx schema fields, ids, nonce/balance progression, and Ed25519 signatures."
+        stdout.puts "Validates tx schema fields, ids, nonce/balance progression, and secp256k1 signatures."
         return 0
       when "wallet:create"
-        stdout.puts "wallet:create - Create local Ed25519 keypair + wallet JSON."
+        stdout.puts "wallet:create - Create local secp256k1 keypair + wallet JSON."
         stdout.puts
         stdout.puts "Options: --github <username>"
         return 0

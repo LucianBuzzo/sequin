@@ -2,6 +2,7 @@ require "base64"
 require "file_utils"
 require "spec"
 require "json"
+require "secp256k1"
 require "../src/sequin_tool/cli"
 require "../src/sequin_tool/commands/score_epoch"
 
@@ -226,36 +227,20 @@ describe SequinTool::CLI do
       File.write(File.join(root, "ledger", "state", "balances.json"), {"alice" => 100, "bob" => 0}.to_pretty_json + "\n")
       File.write(File.join(root, "ledger", "state", "nonces.json"), {"alice" => 0}.to_pretty_json + "\n")
 
-      key_path = File.join(root, "alice.key.pem")
-      pub_der = File.join(root, "alice.pub.der")
-      status = Process.run("openssl", ["genpkey", "-algorithm", "Ed25519", "-out", key_path])
-      status.success?.should be_true
-      status = Process.run("openssl", ["pkey", "-in", key_path, "-pubout", "-outform", "DER", "-out", pub_der])
-      status.success?.should be_true
+      alice_key = Secp256k1::Keypair.new
+      bob_key = Secp256k1::Keypair.new
 
-      pub_bytes = File.read(pub_der).to_slice
-      pub_bytes.size.should be >= 32
-      raw_pub = pub_bytes[pub_bytes.size - 32, 32]
-      pub_b64 = Base64.strict_encode(raw_pub)
-
-      bob_key_path = File.join(root, "bob.key.pem")
-      bob_pub_der = File.join(root, "bob.pub.der")
-      status = Process.run("openssl", ["genpkey", "-algorithm", "Ed25519", "-out", bob_key_path])
-      status.success?.should be_true
-      status = Process.run("openssl", ["pkey", "-in", bob_key_path, "-pubout", "-outform", "DER", "-out", bob_pub_der])
-      status.success?.should be_true
-      bob_pub_bytes = File.read(bob_pub_der).to_slice
-      bob_pub_bytes.size.should be >= 32
-      bob_pub_b64 = Base64.strict_encode(bob_pub_bytes[bob_pub_bytes.size - 32, 32])
+      alice_pub = Secp256k1::Util.public_key_compressed_prefix(alice_key.public_key)
+      bob_pub = Secp256k1::Util.public_key_compressed_prefix(bob_key.public_key)
 
       File.write(File.join(root, "wallets", "alice.json"), {
         "github" => "alice",
-        "pubkey" => "ed25519:#{pub_b64}",
+        "pubkey" => "secp256k1:#{alice_pub}",
         "createdAt" => "2026-03-14T00:00:00Z",
       }.to_pretty_json + "\n")
       File.write(File.join(root, "wallets", "bob.json"), {
         "github" => "bob",
-        "pubkey" => "ed25519:#{bob_pub_b64}",
+        "pubkey" => "secp256k1:#{bob_pub}",
         "createdAt" => "2026-03-14T00:00:00Z",
       }.to_pretty_json + "\n")
 
@@ -272,12 +257,8 @@ describe SequinTool::CLI do
         end
       end
 
-      msg_path = File.join(root, "txmsg.json")
-      sig_path = File.join(root, "txsig.bin")
-      File.write(msg_path, payload)
-      status = Process.run("openssl", ["pkeyutl", "-sign", "-inkey", key_path, "-rawin", "-in", msg_path, "-out", sig_path])
-      status.success?.should be_true
-      sig_b64 = Base64.strict_encode(File.read(sig_path).to_slice)
+      sig = Secp256k1::Signature.sign(payload, alice_key.private_key)
+      sig_b64 = "secp256k1:#{Secp256k1::Util.to_padded_hex_32(sig.r)}:#{Secp256k1::Util.to_padded_hex_32(sig.s)}"
 
       tx = {
         "id" => "tx-1",
