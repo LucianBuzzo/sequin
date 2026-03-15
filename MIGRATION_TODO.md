@@ -15,16 +15,18 @@
 
 ### 0.1 Decide crypto path (blocking)
 - [x] Choose and record signature standard:
-  - [ ] Keep Ed25519 (preferred for compatibility)
-  - [x] OR migrate to secp256k1 (breaking format change)
+  - not selected: Keep Ed25519 (compatibility path)
+  - [x] selected: migrate to secp256k1 (breaking format change)
 - [x] Decision captured (2026-03-15): prototype path will use `secp256k1`; backward compatibility not required.
 
 **Acceptance:** decision documented in README + this file.
 
 ### 0.2 Baseline branch protections
-- [ ] Confirm required checks on `master`
-- [ ] Confirm up-to-date branch requirement
+- [x] Confirm required checks on `master`
+- [x] Confirm up-to-date branch requirement
 - [ ] Enable merge queue (recommended)
+
+**Status note (2026-03-15):** confirmed via GitHub branch protection API for `master` that required status checks are enabled and strict/up-to-date is enabled (`strict: true`; contexts: `Run unit tests`, `Lint repo files`, `validate`).
 
 **Acceptance:** screenshot or CLI output linked in PR.
 
@@ -42,7 +44,7 @@
 ### 1.2 Dependency hygiene
 - [x] Mark `kemal` + `crest` as legacy (temporary)
 - [ ] Add required deps for:
-  - [ ] crypto path
+  - [x] crypto path (`secp256k1` in `shard.yml`)
   - [ ] HTTP/GitHub API client robustness
   - [ ] CLI ergonomics (if needed)
 
@@ -127,6 +129,8 @@ Subcommands (empty or stubbed initially):
   - [ ] Crystal validates legacy JS-generated tx fixtures
   - [ ] (If temporarily needed) JS validates Crystal-generated fixtures
 
+**Status note (2026-03-15):** explicitly running in lean prototype mode; full JS<->Crystal backward-compat parity fixtures are deferred.
+
 **Acceptance:** signature and nonce validation parity demonstrated in CI.
 
 ---
@@ -193,7 +197,7 @@ Run end-to-end in dry run and real flow:
 - [x] PR-5: crypto + tx tooling port
 - [x] PR-6: workflow cutover
 - [x] PR-7: remove legacy server + JS scripts
-- [ ] PR-8: final cleanup/docs + release
+- [x] PR-8: final cleanup/docs + release
 
 ---
 
