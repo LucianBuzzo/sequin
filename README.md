@@ -138,3 +138,4 @@ crystal run src/sequin_tool.cr -- repo:lint
 - `AGENTS.md` (project field notes + guardrails)
 - `GITHUB_NATIVE_SEQUIN_PLAN.md`
 - `GITHUB_NATIVE_USAGE.md`
+- `sips/README.md` + `sips/SIP_TEMPLATE.md` (Sequin Improvement Proposal process/template)
