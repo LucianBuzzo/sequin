@@ -14,7 +14,7 @@
     "pubkey": {
       "type": "string",
       "minLength": 16,
-      "pattern": "^ed25519:[A-Za-z0-9+/=]+$"
+      "pattern": "^secp256k1:(02|03)[0-9a-fA-F]{64}$"
     },
     "createdAt": {
       "type": "string",

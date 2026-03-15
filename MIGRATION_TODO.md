@@ -14,9 +14,10 @@
 ## Phase 0 — Foundations
 
 ### 0.1 Decide crypto path (blocking)
-- [ ] Choose and record signature standard:
+- [x] Choose and record signature standard:
   - [ ] Keep Ed25519 (preferred for compatibility)
-  - [ ] OR migrate to secp256k1 (breaking format change)
+  - [x] OR migrate to secp256k1 (breaking format change)
+- [x] Decision captured (2026-03-15): prototype path will use `secp256k1`; backward compatibility not required.
 
 **Acceptance:** decision documented in README + this file.
 
@@ -162,7 +163,7 @@ Subcommands (empty or stubbed initially):
 
 ### 7.3 Docs cleanup
 - [x] Update README to single canonical architecture
-- [ ] Add migration notes/changelog entries
+- [x] Add migration notes/changelog entries
 
 **Acceptance:** repo has one runtime model (Crystal + GitHub-backed workflows).
 
@@ -176,6 +177,8 @@ Run end-to-end in dry run and real flow:
 - [ ] Transfer tx PR + block apply
 - [ ] Nightly score + mint epoch
 - [ ] Ledger verify + summary outputs
+
+**Status note (2026-03-15):** Dry-run lifecycle executed successfully in an isolated temp repo using Crystal-only commands (`wallet:create`, `tx:sign`, `verify:tx`, `ledger:apply-block`, `rewards:score-epoch`, `rewards:mint`, `verify:chain`, `ledger:summary`). Real PR-backed flow remains pending.
 
 **Acceptance:** full lifecycle works with Crystal-only command path.
 

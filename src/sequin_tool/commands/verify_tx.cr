@@ -1,12 +1,12 @@
-require "base64"
 require "digest/sha256"
 require "json"
+require "secp256k1"
 
 module SequinTool
   module Commands
     class VerifyTx
-      PUBKEY_PREFIX = "ed25519:"
-      SPKI_PREFIX = Bytes[0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00]
+      PUBKEY_PREFIX = "secp256k1:"
+      SIGNATURE_PREFIX = "secp256k1:"
 
       def initialize(@stdout : IO = STDOUT, @stderr : IO = STDERR)
       end
@@ -148,76 +148,43 @@ module SequinTool
 
       private def validate_pubkey(pubkey : String, github : String)
         unless pubkey.starts_with?(PUBKEY_PREFIX)
-          fail!("Invalid pubkey for #{github}: pubkey must be prefixed with ed25519:")
+          fail!("Invalid pubkey for #{github}: pubkey must be prefixed with secp256k1:")
         end
 
-        b64 = pubkey[PUBKEY_PREFIX.size..-1]
-        raw = Base64.decode(b64)
-        unless raw.size == 32
-          fail!("Invalid pubkey for #{github}: ed25519 public key must decode to 32 bytes")
+        encoded = pubkey[PUBKEY_PREFIX.size..-1]
+        unless encoded.matches?(/\A(02|03)[0-9a-fA-F]{64}\z/)
+          fail!("Invalid pubkey for #{github}: expected compressed secp256k1 pubkey hex")
         end
-      rescue ex
-        fail!("Invalid pubkey for #{github}: #{ex.message}")
       end
 
       private def verify_signature!(tx : Hash(String, JSON::Any), wallet : Hash(String, JSON::Any), ctx : String)
-        pubkey = wallet["pubkey"].as_s
-        sig_b64 = tx["signature"].as_s
-
-        b64 = pubkey[PUBKEY_PREFIX.size..-1]
-        raw_key = Base64.decode(b64)
-        signature = Base64.decode(sig_b64)
-
-        unless signature.size == 64
-          fail!("#{ctx}: signature verification error: signature must decode to 64 bytes (ed25519)")
-        end
-
-        spki_der = Bytes.new(SPKI_PREFIX.size + raw_key.size)
-        SPKI_PREFIX.each_with_index { |byte, idx| spki_der[idx] = byte }
-        raw_key.each_with_index { |byte, idx| spki_der[SPKI_PREFIX.size + idx] = byte }
-
+        pubkey = wallet["pubkey"].as_s[PUBKEY_PREFIX.size..-1]
+        signature = tx["signature"].as_s
         payload = canonical_tx_string(tx)
 
-        pub_file = File.tempfile("sequin-pub")
-        sig_file = File.tempfile("sequin-sig")
-        msg_file = File.tempfile("sequin-msg")
-
-        begin
-          pub_file.write(spki_der)
-          sig_file.write(signature)
-          msg_file << payload
-          pub_file.flush
-          sig_file.flush
-          msg_file.flush
-
-          output = IO::Memory.new
-          err = IO::Memory.new
-          status = Process.run(
-            "openssl",
-            [
-              "pkeyutl",
-              "-verify",
-              "-pubin",
-              "-inkey", pub_file.path,
-              "-keyform", "DER",
-              "-rawin",
-              "-in", msg_file.path,
-              "-sigfile", sig_file.path,
-            ],
-            output: output,
-            error: err
-          )
-
-          unless status.success?
-            fail!("#{ctx}: signature verification failed")
-          end
-        rescue ex
-          fail!("#{ctx}: signature verification error: #{ex.message}")
-        ensure
-          pub_file.close
-          sig_file.close
-          msg_file.close
+        unless signature.starts_with?(SIGNATURE_PREFIX)
+          fail!("#{ctx}: signature must be prefixed with secp256k1:")
         end
+
+        parts = signature[SIGNATURE_PREFIX.size..-1].split(":")
+        unless parts.size == 2
+          fail!("#{ctx}: signature must be formatted as secp256k1:<r_hex>:<s_hex>")
+        end
+
+        r_hex, s_hex = parts
+        unless r_hex.matches?(/\A[0-9a-fA-F]{64}\z/) && s_hex.matches?(/\A[0-9a-fA-F]{64}\z/)
+          fail!("#{ctx}: signature r/s must be 64-char hex values")
+        end
+
+        sig = Secp256k1::ECDSASignature.new(BigInt.new(r_hex, 16), BigInt.new(s_hex, 16))
+        point = Secp256k1::Util.restore_public_key(pubkey)
+
+        valid = Secp256k1::Signature.verify(payload, sig, point)
+        fail!("#{ctx}: signature verification failed") unless valid
+      rescue ex : CLIError
+        raise ex
+      rescue ex
+        fail!("#{ctx}: signature verification error: #{ex.message}")
       end
 
       private def fail!(message : String) : NoReturn

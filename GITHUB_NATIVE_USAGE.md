@@ -21,7 +21,7 @@ Create `wallets/<your-github-username>.json`:
 ```json
 {
   "github": "your-username",
-  "pubkey": "ed25519:BASE64_PUBKEY",
+  "pubkey": "secp256k1:COMPRESSED_PUBKEY_HEX",
   "createdAt": "2026-03-13T12:00:00Z"
 }
 ```
@@ -51,7 +51,7 @@ Open a PR containing that tx file.
   "sigVersion": 1,
   "memo": "hello sequin",
   "createdAt": "2026-03-13T12:05:00Z",
-  "signature": "BASE64_SIG"
+  "signature": "secp256k1:R_HEX:S_HEX"
 }
 ```
 
@@ -62,7 +62,7 @@ Open a PR containing that tx file.
   - registered sender/receiver wallets
   - nonce progression (`current + 1`)
   - sufficient sender balance
-  - Ed25519 signature against canonical payload
+  - secp256k1 signature against canonical payload
 - after merge, `rebuild-ledger` applies pending tx into a new block and updates balances/nonces.
 
 ### Nonce collision policy

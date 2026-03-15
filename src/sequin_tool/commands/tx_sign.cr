@@ -1,5 +1,5 @@
-require "base64"
 require "json"
+require "secp256k1"
 
 module SequinTool
   module Commands
@@ -32,9 +32,9 @@ module SequinTool
         }
 
         payload = canonical_tx_json(tx)
-        sig = sign_payload(payload, key_path)
+        signature = sign_payload(payload, key_path)
 
-        tx["signature"] = JSON::Any.new(Base64.strict_encode(sig))
+        tx["signature"] = JSON::Any.new(signature)
 
         stamp = created_at.gsub(/[:.]/, "-")
         out_path = File.join(pending_dir, "#{stamp}__#{tx_id}.json")
@@ -60,33 +60,18 @@ module SequinTool
         end
       end
 
-      private def sign_payload(payload : String, key_path : String) : Bytes
-        msg_path = File.join(Dir.tempdir, "sequin-#{Random::Secure.hex(6)}.msg")
-        sig_path = File.join(Dir.tempdir, "sequin-#{Random::Secure.hex(6)}.sig")
+      private def sign_payload(payload : String, key_path : String) : String
+        private_key_hex = File.read(key_path).strip
+        raise CLIError.new("Invalid private key hex", exit_code: 1) if private_key_hex.empty?
 
-        begin
-          File.write(msg_path, payload)
-          output = IO::Memory.new
-          error = IO::Memory.new
-          status = Process.run(
-            "openssl",
-            ["pkeyutl", "-sign", "-inkey", key_path, "-rawin", "-in", msg_path, "-out", sig_path],
-            output: output,
-            error: error
-          )
+        private_key = BigInt.new(private_key_hex, 16)
+        sig = Secp256k1::Signature.sign(payload, private_key)
 
-          unless status.success?
-            err_s = error.to_s
-            out_s = output.to_s
-            msg = !err_s.empty? ? err_s : (!out_s.empty? ? out_s : "command failed")
-            raise CLIError.new("openssl signing failed: #{msg}", exit_code: 1)
-          end
-
-          File.read(sig_path).to_slice
-        ensure
-          File.delete?(msg_path)
-          File.delete?(sig_path)
-        end
+        r_hex = Secp256k1::Util.to_padded_hex_32(sig.r)
+        s_hex = Secp256k1::Util.to_padded_hex_32(sig.s)
+        "secp256k1:#{r_hex}:#{s_hex}"
+      rescue ex
+        raise CLIError.new("Failed to sign payload: #{ex.message}", exit_code: 1)
       end
     end
   end
