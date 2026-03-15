@@ -37,3 +37,7 @@ Suggested status lifecycle:
 ## Template
 
 Use: `sips/SIP_TEMPLATE.md`
+
+## First SIP
+
+- `sips/SIP-0001-process-and-statuses.md` defines the baseline SIP governance process.
