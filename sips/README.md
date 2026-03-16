@@ -38,6 +38,7 @@ Suggested status lifecycle:
 
 Use: `sips/SIP_TEMPLATE.md`
 
-## First SIP
+## Current SIPs
 
-- `sips/SIP-0001-process-and-statuses.md` defines the baseline SIP governance process.
+- `sips/SIP-0001-process-and-statuses.md` — baseline SIP governance process.
+- `sips/SIP-0002-federated-consensus-and-fork-discovery.md` — draft path to decentralized Sequin using fork discovery + federated finality + claims-based issuance.
