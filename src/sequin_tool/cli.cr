@@ -4,6 +4,7 @@ require "./commands/apply_block"
 require "./commands/ledger_summary"
 require "./commands/mint_rewards"
 require "./commands/score_epoch"
+require "./commands/rewards_status"
 require "./commands/repo_lint"
 require "./commands/tx_next_nonce"
 require "./commands/tx_sign"
@@ -72,6 +73,10 @@ module SequinTool
         date = parse_date_option(args[1..], stderr)
         return 1 if date == :error
         Commands::ScoreEpoch.new(stdout, stderr).call(date.as(String?), root)
+      when "rewards:status"
+        date = parse_date_option(args[1..], stderr)
+        return 1 if date == :error
+        Commands::RewardsStatus.new(stdout, stderr).call(date.as(String?), root)
       else
         command = commands.find { |item| item.name == args[0] }
         unless command
@@ -91,11 +96,11 @@ module SequinTool
     end
 
     def write_help(io : IO)
-      io.puts "sequin_tool - unified Crystal CLI for GitHub-backed Sequin"
+      io.puts "sequin - unified Crystal CLI for GitHub-backed Sequin"
       io.puts
       io.puts "Usage:"
-      io.puts "  sequin_tool <command> [options]"
-      io.puts "  sequin_tool help <command>"
+      io.puts "  sequin <command> [options]"
+      io.puts "  sequin help <command>"
       io.puts
       io.puts "Implemented commands:"
       io.puts "  verify:chain          Verify canonical ledger chain state."
@@ -108,6 +113,7 @@ module SequinTool
       io.puts "  ledger:apply-block    Apply pending transactions into ledger state."
       io.puts "  rewards:mint          Mint a reward manifest into ledger state."
       io.puts "  rewards:score-epoch   Score GitHub PR activity into reward manifest."
+      io.puts "  rewards:status        Show idempotency status for an epoch manifest."
       io.puts
       io.puts "Stub commands:"
       commands.each do |command|
@@ -169,6 +175,11 @@ module SequinTool
         return 0
       when "rewards:score-epoch"
         stdout.puts "rewards:score-epoch - Score GitHub PR activity into reward manifest."
+        stdout.puts
+        stdout.puts "Options: --date YYYY-MM-DD"
+        return 0
+      when "rewards:status"
+        stdout.puts "rewards:status - Show epoch reward idempotency status."
         stdout.puts
         stdout.puts "Options: --date YYYY-MM-DD"
         return 0

@@ -127,10 +127,19 @@ Crystal-based commands and specs are currently verified against Crystal `1.13.2`
 
 ### CLI helper
 
+Prefer the launcher:
+
 ```bash
-crystal run src/sequin_tool.cr -- wallet:create --github <your-github-username>
-crystal run src/sequin_tool.cr -- tx:next-nonce --user <you>
-crystal run src/sequin_tool.cr -- tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello"
+./sequin wallet:create --github <your-github-username>
+./sequin tx:next-nonce --user <you>
+./sequin tx:sign --from <you> --to <them> --amount 10 --nonce 1 --memo "hello"
+```
+
+Optional local install so you can run `sequin <command>` directly:
+
+```bash
+just install-local
+# then ensure ~/bin is on PATH
 ```
 
 - Public wallet file: `wallets/<username>.json`
@@ -139,12 +148,13 @@ crystal run src/sequin_tool.cr -- tx:sign --from <you> --to <them> --amount 10 -
 ### Validation commands
 
 ```bash
-crystal run src/sequin_tool.cr -- verify:chain
-crystal run src/sequin_tool.cr -- verify:tx
-crystal run src/sequin_tool.cr -- rewards:score-epoch --date YYYY-MM-DD
-crystal run src/sequin_tool.cr -- rewards:mint --date YYYY-MM-DD
-crystal run src/sequin_tool.cr -- ledger:summary --top 10 --epochs 7
-crystal run src/sequin_tool.cr -- repo:lint
+./sequin verify:chain
+./sequin verify:tx
+./sequin rewards:score-epoch --date YYYY-MM-DD
+./sequin rewards:status --date YYYY-MM-DD
+./sequin rewards:mint --date YYYY-MM-DD
+./sequin ledger:summary --top 10 --epochs 7
+./sequin repo:lint
 ```
 
 ---

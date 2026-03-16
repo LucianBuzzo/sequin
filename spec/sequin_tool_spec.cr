@@ -38,7 +38,7 @@ describe SequinTool::CLI do
     stderr = IO::Memory.new
 
     cli.run(["--help"], stdout, stderr).should eq(0)
-    stdout.to_s.should contain("sequin_tool - unified Crystal CLI")
+    stdout.to_s.should contain("sequin - unified Crystal CLI")
     stdout.to_s.should contain("verify:chain")
     stderr.to_s.should eq("")
   end
