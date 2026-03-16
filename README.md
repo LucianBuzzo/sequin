@@ -16,11 +16,9 @@
   <br>
 </div>
 
-## What changed?
+## Canonical model
 
-Sequin originally started as a Crystal server app.
-
-It now follows a new design:
+Sequin operates as a GitHub-native ledger:
 
 - **Ledger lives in git** (`ledger/`)
 - **Wallets are registered by PR** (`wallets/<github-user>.json`)
@@ -91,6 +89,32 @@ src/sequin_tool/
   - optional weekday abort when merged PR count is zero
 
 Config: `config/reward-repos.json`
+
+### Add a new repository for rewards
+
+To include another OSS repo in reward scoring:
+
+1. Edit `config/reward-repos.json`
+2. Add the repo to `repos` using `owner/name` format
+3. Open a PR and merge after checks pass
+4. Trigger nightly rewards naturally (or run `workflow_dispatch`) and verify the next epoch manifest includes activity from the new repo
+
+Example:
+
+```json
+{
+  "repos": [
+    "LucianBuzzo/sequin",
+    "owner/another-repo"
+  ]
+}
+```
+
+Notes:
+
+- The workflow token must be able to read the target repo's PR metadata.
+- Keep repos public (or ensure token access), otherwise scoring may fail.
+- Add noisy bot accounts to `excludeLogins` when needed.
 
 ---
 
