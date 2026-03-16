@@ -87,6 +87,9 @@ src/sequin_tool/
   - reject if total distributed > daily emission
   - reject if any user reward > `maxRewardPerUser`
   - optional weekday abort when merged PR count is zero
+- PR-level idempotency:
+  - rewarded PR identities are tracked in `ledger/state/rewarded_prs.json`
+  - rerunning mint for the same day only mints new, previously unseen PR claims
 
 Config: `config/reward-repos.json`
 

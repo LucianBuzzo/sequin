@@ -146,13 +146,17 @@ describe SequinTool::CLI do
       File.write(File.join(root, "ledger", "state", "balances.json"), ({} of String => Int32).to_pretty_json + "\n")
       File.write(File.join(root, "ledger", "state", "reward_epochs.json"), ([] of String).to_pretty_json + "\n")
       File.write(File.join(root, "config", "reward-repos.json"), {
-        "dailyEmission" => 10000,
+        "dailyEmission" => 3000,
         "maxRewardPerUser" => 3000,
       }.to_pretty_json + "\n")
 
       reward = {
         "epoch" => "2026-03-13",
-        "totals" => {"dailyEmission" => 10000},
+        "totals" => {"dailyEmission" => 3000},
+        "details" => [
+          {"repo" => "owner/repo", "number" => 1, "prKey" => "owner/repo#1", "login" => "alice", "score" => 20.0},
+          {"repo" => "owner/repo", "number" => 2, "prKey" => "owner/repo#2", "login" => "bob", "score" => 10.0},
+        ],
         "rewards" => [
           {"github" => "alice", "amount" => 2000},
           {"github" => "bob", "amount" => 1000},
@@ -165,7 +169,7 @@ describe SequinTool::CLI do
       stderr = IO::Memory.new
 
       cli.run(["rewards:mint", "--date", "2026-03-13"], stdout, stderr, root).should eq(0)
-      stdout.to_s.should contain("Minted reward epoch 2026-03-13")
+      stdout.to_s.should contain("Minted incremental reward epoch 2026-03-13")
       stderr.to_s.should eq("")
 
       balances = JSON.parse(File.read(File.join(root, "ledger", "state", "balances.json"))).as_h
@@ -174,6 +178,15 @@ describe SequinTool::CLI do
 
       epochs = JSON.parse(File.read(File.join(root, "ledger", "state", "reward_epochs.json"))).as_a
       epochs.map(&.as_s).should contain("2026-03-13")
+
+      rewarded = JSON.parse(File.read(File.join(root, "ledger", "state", "rewarded_prs.json"))).as_h
+      rewarded.has_key?("owner/repo#1").should be_true
+      rewarded.has_key?("owner/repo#2").should be_true
+
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      cli.run(["rewards:mint", "--date", "2026-03-13"], stdout, stderr, root).should eq(0)
+      stdout.to_s.should contain("No new reward claims")
     end
   end
 

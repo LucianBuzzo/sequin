@@ -116,9 +116,12 @@ module SequinTool
 
             score = score_pr(pr)
 
+            pr_number = pr["number"].as_i64
             details << {
               "repo"         => JSON::Any.new(repo),
-              "number"       => JSON::Any.new(pr["number"].as_i64),
+              "number"       => JSON::Any.new(pr_number),
+              "prKey"        => JSON::Any.new("#{repo}##{pr_number}"),
+              "mergedAt"     => JSON::Any.new(pr["merged_at"]?.try(&.as_s?) || nil),
               "title"        => JSON::Any.new(pr["title"]?.try(&.as_s) || ""),
               "login"        => JSON::Any.new(login),
               "score"        => JSON::Any.new(score),
