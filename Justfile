@@ -4,10 +4,14 @@ set shell := ["bash", "-cu"]
 all:
   ./sequin
 
-# Run test suite
+# Run full test suite
 
 test:
   crystal spec
+
+# Run a single spec file, e.g. `just test-file spec/cli_spec.cr`
+test-file spec_file:
+  crystal spec {{spec_file}}
 
 # Build local binary
 build:

@@ -148,6 +148,8 @@ just install-local
 ### Validation commands
 
 ```bash
+just test
+just test-file spec/cli_spec.cr
 ./sequin verify:chain
 ./sequin verify:tx
 ./sequin rewards:score-epoch --date YYYY-MM-DD
